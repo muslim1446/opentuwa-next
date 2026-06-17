@@ -6,6 +6,8 @@ import { PlayerProvider } from '@/context/PlayerContext'
 
 export function Providers({ children }: { children: ReactNode }) {
   useEffect(() => {
+    if (document.getElementById('_universal_loader')) return
+
     const style = document.createElement('style')
     style.textContent = `
       #_universal_loader {
@@ -38,7 +40,13 @@ export function Providers({ children }: { children: ReactNode }) {
     }
     if (document.readyState === 'complete') reveal()
     else window.addEventListener('load', reveal)
-    setTimeout(reveal, 6000)
+    const fallbackTimer = setTimeout(reveal, 6000)
+
+    return () => {
+      clearTimeout(fallbackTimer)
+      overlay.remove()
+      style.remove()
+    }
   }, [])
 
   return (
