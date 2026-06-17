@@ -394,13 +394,14 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     return () => evts.forEach(e => window.removeEventListener(e, handler))
   }, [])
 
-  // auto-load verse when state changes
+  // auto-load verse when state changes (must include all deps to avoid stale closure)
   useEffect(() => {
     if (quranDataLoaded && view === 'cinema') {
       loadTranslationData(currentTrans)
       loadVerse(true)
     }
-  }, [currentChapterIdx, currentVerseIdx, currentReciter, currentTrans, currentAudioTrans])
+  }, [currentChapterIdx, currentVerseIdx, currentReciter, currentTrans, currentAudioTrans,
+      quranDataLoaded, view, loadVerse, loadTranslationData])
 
   // vh on resize
   useEffect(() => {
