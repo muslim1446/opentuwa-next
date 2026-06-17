@@ -16,23 +16,13 @@ export function PlayerIsland() {
   }))
 
   return (
-    <div
-      id="player-island"
-      className="fixed bottom-[max(40px,calc(env(safe-area-inset-bottom,0px)+16px))] left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 px-4 py-2 rounded-[40px] select-none transition-all duration-500"
-      style={{
-        background: 'var(--glass-bg)',
-        backdropFilter: 'var(--glass-vibrancy)',
-        WebkitBackdropFilter: 'var(--glass-vibrancy)',
-        border: '0.5px solid var(--glass-border)',
-        boxShadow: 'var(--shadow-floating)',
-      }}
-    >
-      <div className="island-left flex items-center gap-2">
-        <a href="/" className="app-brand relative top-auto left-auto transform-none z-auto h-11 px-1 gap-1.5 flex items-center no-underline flex-shrink-0" aria-label="Tuwa Home">
+    <div id="player-island">
+      <div className="island-left">
+        <a href="/" className="app-brand" aria-label="Tuwa Home">
           <span className="brand-icon">
-            <img src="https://opentuwa.com/assets/ui/favicon.svg" alt="" width={22} height={22} className="block" />
+            <img src="https://opentuwa.com/assets/ui/favicon.svg" alt="" width={22} height={22} />
           </span>
-          <span className="brand-text text-[15px] font-semibold leading-none" style={{ color: 'var(--text-primary)' }}>Tuwa</span>
+          <span className="brand-text">Tuwa</span>
         </a>
         <CustomSelect
           items={transItems}
@@ -45,8 +35,7 @@ export function PlayerIsland() {
 
       <button
         id="play-pause-btn"
-        className="island-play-btn w-11 h-11 rounded-full flex items-center justify-center cursor-pointer flex-shrink-0 border-none transition-all duration-200"
-        style={{ background: 'rgba(255,255,255,0.15)', color: 'var(--text-primary)' }}
+        className="island-play-btn"
         onClick={togglePlayPause}
         aria-label={isPlaying ? 'Pause' : 'Play'}
         tabIndex={0}
@@ -62,7 +51,7 @@ export function PlayerIsland() {
         )}
       </button>
 
-      <div className="island-right flex items-center gap-2">
+      <div className="island-right">
         <VolumeControl />
         <EQPopup />
       </div>

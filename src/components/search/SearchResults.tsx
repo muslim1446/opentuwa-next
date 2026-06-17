@@ -10,12 +10,12 @@ interface SearchResultsProps {
 }
 
 export function SearchResults({ results, hasQuery }: SearchResultsProps) {
-  const { quranData } = usePlayer()
+  const { quranData, launchPlayer } = usePlayer()
   const { translate } = useI18n()
 
   if (!hasQuery) {
     return (
-      <div className="no-results col-span-full text-center mt-10 text-[17px] font-medium" style={{ color: 'var(--text-secondary)' }}>
+      <div className="no-results" style={{ gridColumn: '1 / -1' }}>
         {translate('dashboard.useKeyboard')}
       </div>
     )
@@ -23,7 +23,7 @@ export function SearchResults({ results, hasQuery }: SearchResultsProps) {
 
   if (results.length === 0) {
     return (
-      <div className="no-results col-span-full text-center mt-10 text-[17px] font-medium" style={{ color: 'var(--text-secondary)' }}>
+      <div className="no-results" style={{ gridColumn: '1 / -1' }}>
         {translate('dashboard.searching')}
       </div>
     )
@@ -39,7 +39,7 @@ export function SearchResults({ results, hasQuery }: SearchResultsProps) {
             key={chNum}
             chapterNumber={ch.chapterNumber}
             englishName={ch.english_name}
-            index={chNum - 1}
+            onClick={() => launchPlayer(chNum, 1)}
           />
         )
       })}

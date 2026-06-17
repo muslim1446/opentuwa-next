@@ -4,9 +4,10 @@ import { useState, useRef, useEffect } from 'react'
 import { usePlayer } from '@/context/PlayerContext'
 
 export function VolumeControl() {
-  const { volume, isMuted, setVolume, toggleMute } = usePlayer()
+  const { volume, isMuted, setVolume } = usePlayer()
   const [isOpen, setIsOpen] = useState(false)
   const wrapRef = useRef<HTMLDivElement>(null)
+  const muteTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -20,19 +21,18 @@ export function VolumeControl() {
 
   const displayVolume = isMuted ? 0 : volume
 
+  const handleMouseEnter = () => {
+    if (muteTimerRef.current) clearTimeout(muteTimerRef.current)
+    setIsOpen(true)
+  }
+
+  const handleMouseLeave = () => {
+    muteTimerRef.current = setTimeout(() => setIsOpen(false), 500)
+  }
+
   return (
-    <div ref={wrapRef} className="island-volume-wrap relative flex items-center">
-      <div
-        className={`volume-popover absolute bottom-full left-1/2 -translate-x-1/2 px-4 py-3 z-[110] rounded-2xl shadow-floating transition-all duration-250 ${
-          isOpen ? 'opacity-100 visible pointer-events-auto scale-100' : 'opacity-0 invisible pointer-events-none scale-[0.92]'
-        }`}
-        style={{
-          background: 'var(--glass-bg)',
-          backdropFilter: 'var(--glass-vibrancy)',
-          WebkitBackdropFilter: 'var(--glass-vibrancy)',
-          border: '0.5px solid var(--glass-border)',
-        }}
-      >
+    <div ref={wrapRef} className={`island-volume-wrap ${isOpen ? 'volume-open' : ''}`} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <div className="volume-popover">
         <input
           type="range"
           min="0"
@@ -40,14 +40,13 @@ export function VolumeControl() {
           step="0.05"
           value={displayVolume}
           onChange={(e) => setVolume(parseFloat(e.target.value))}
-          className="island-volume-slider w-[120px] h-1 rounded-full appearance-none cursor-pointer outline-none"
-          style={{ background: 'rgba(255,255,255,0.2)' }}
+          className="island-volume-slider"
           aria-label="Volume"
         />
       </div>
       <button
         id="volume-btn"
-        className="island-icon-btn w-11 h-11 rounded-full bg-transparent border-none flex items-center justify-center cursor-pointer flex-shrink-0"
+        className="island-icon-btn"
         onClick={() => setIsOpen(prev => !prev)}
         aria-label={isMuted ? 'Unmute' : 'Mute'}
         tabIndex={0}

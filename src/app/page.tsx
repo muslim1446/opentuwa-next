@@ -23,8 +23,10 @@ export default function Home() {
   return (
     <>
       <AppBrand />
-      {view === 'dashboard' && <DashboardView />}
-      {view === 'cinema' && <PlayerView />}
+      <div id="dashboard-view" className={view === 'dashboard' ? 'active' : ''}>
+        <DashboardView />
+      </div>
+      <PlayerView />
       <IslandSearch />
       {!isOnline && <StatusHub />}
     </>

@@ -8,7 +8,6 @@ import { KEYBOARD_KEYS } from '@/lib/configs'
 export function SearchOverlay() {
   const [isOpen, setIsOpen] = useState(false)
   const [searchString, setSearchString] = useState('')
-  const [results, setResults] = useState<number[]>([])
   const { quranData, launchPlayer } = usePlayer()
   const { translate } = useI18n()
   const overlayRef = useRef<HTMLDivElement>(null)
@@ -50,40 +49,13 @@ export function SearchOverlay() {
     return () => window.removeEventListener('toggle-search' as any, handler)
   }, [])
 
-  if (!isOpen) return null
-
   return (
-    <div
-      ref={overlayRef}
-      id="search-overlay"
-      className="active fixed inset-0 z-[2500] grid grid-cols-[320px_1fr]"
-      style={{
-        background: 'var(--glass-bg)',
-        backdropFilter: 'var(--glass-vibrancy)',
-        WebkitBackdropFilter: 'var(--glass-vibrancy)',
-      }}
-    >
-      <div
-        className="keyboard-section p-8 flex flex-col overflow-y-auto"
-        style={{
-          background: 'var(--surface)',
-          borderRight: '0.5px solid var(--glass-border)',
-          boxShadow: 'var(--shadow-soft)',
-        }}
-      >
-        <div
-          ref={inputDisplayRef}
-          id="search-input-display"
-          className="mb-4 px-4 py-3 text-[17px] font-medium rounded-xl min-h-11 flex items-center border"
-          style={{
-            background: 'var(--surface-secondary)',
-            color: 'var(--text-primary)',
-            borderColor: 'var(--glass-border)',
-          }}
-        >
+    <div ref={overlayRef} id="search-overlay" className={isOpen ? 'active' : ''}>
+      <div className="keyboard-section">
+        <div ref={inputDisplayRef} id="search-input-display">
           {searchString || '\u00A0'}
         </div>
-        <div className="keyboard-grid grid grid-cols-6 gap-2">
+        <div className="keyboard-grid">
           {KEYBOARD_KEYS.map(key => (
             <div
               key={key}
@@ -99,23 +71,15 @@ export function SearchOverlay() {
           ))}
         </div>
       </div>
-      <div className="results-section p-8 overflow-y-auto">
-        <div className="row-header row-header-top-results text-[22px] font-bold -tracking-[0.03em] mb-4" style={{ color: 'var(--text-primary)' }}>
+      <div className="results-section">
+        <div className="row-header row-header-top-results" style={{ marginLeft: 'max(16px, env(safe-area-inset-left, 16px))', fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em', marginBottom: 16, color: 'var(--text-primary)' }}>
           {translate('dashboard.topResults')}
         </div>
-        <div
-          id="search-results-grid"
-          className="results-grid grid gap-4 pb-20"
-          style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}
-        >
+        <div id="search-results-grid" className="results-grid">
           {searchString.length <= 2 ? (
-            <div className="no-results col-span-full text-center mt-10 text-[17px] font-medium" style={{ color: 'var(--text-secondary)' }}>
-              {translate('dashboard.useKeyboard')}
-            </div>
+            <div className="no-results">{translate('dashboard.useKeyboard')}</div>
           ) : filteredResults.length === 0 ? (
-            <div className="no-results col-span-full text-center mt-10 text-[17px] font-medium" style={{ color: 'var(--text-secondary)' }}>
-              {translate('dashboard.searching')}
-            </div>
+            <div className="no-results">{translate('dashboard.searching')}</div>
           ) : (
             filteredResults.map(chNum => {
               const ch = quranData[chNum - 1]
@@ -129,12 +93,8 @@ export function SearchOverlay() {
                   onClick={() => { setIsOpen(false); launchPlayer(chNum, 1) }}
                   onKeyDown={(e) => { if (e.key === 'Enter') { setIsOpen(false); launchPlayer(chNum, 1) }}}
                 >
-                  <div className="card-bg-num absolute top-3 right-5 text-[6.4rem] font-bold leading-none -tracking-[0.04em] opacity-30" style={{ color: 'var(--text-tertiary)' }}>
-                    {chNum}
-                  </div>
-                  <div className="card-title text-[22px] font-semibold z-[2] whitespace-nowrap overflow-hidden text-ellipsis -tracking-[0.02em]" style={{ color: 'var(--text-primary)' }}>
-                    {ch.english_name}
-                  </div>
+                  <div className="card-bg-num">{chNum}</div>
+                  <div className="card-title">{ch.english_name}</div>
                 </div>
               )
             })

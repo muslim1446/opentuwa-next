@@ -4,6 +4,8 @@ const nextConfig = {
     unoptimized: true,
   },
   trailingSlash: false,
+  skipTrailingSlashRedirect: true,
+  skipMiddlewareUrlNormalize: true,
   eslint: {
     ignoreDuringBuilds: true,
   },

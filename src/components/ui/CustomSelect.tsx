@@ -46,22 +46,22 @@ export function CustomSelect({ items, value, onChange, placeholder, wrapperId }:
   }, [])
 
   return (
-    <div ref={wrapperRef} className="custom-select-wrapper relative select-none" id={wrapperId}>
+    <div ref={wrapperRef} className={`custom-select-wrapper ${isOpen ? 'open' : ''}`} id={wrapperId}>
       <button
-        className={`custom-select-trigger w-full ${isOpen ? 'open' : ''}`}
+        className="custom-select-trigger"
         onClick={handleTriggerClick}
         role="combobox"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         tabIndex={0}
       >
-        <span className="mx-auto max-w-full truncate -tracking-[0.41px]">{displayText}</span>
+        <span>{displayText}</span>
       </button>
       <div className="custom-options" role="listbox">
         {items.map(item => (
           <div
             key={item.value}
-            className={`custom-option relative ${item.value === value ? 'selected' : ''}`}
+            className={`custom-option ${item.value === value ? 'selected' : ''}`}
             data-value={item.value}
             role="option"
             tabIndex={0}

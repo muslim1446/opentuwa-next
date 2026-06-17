@@ -1,34 +1,51 @@
 'use client'
 
-import { useOnlineStatus } from '@/hooks/useOnlineStatus'
+import { useEffect, useState } from 'react'
 
 export function StatusHub() {
-  const isOnline = useOnlineStatus()
+  const [visible, setVisible] = useState(true)
 
-  if (isOnline) return null
+  useEffect(() => {
+    const timer = setTimeout(() => setVisible(false), 10000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (!visible) return null
 
   return (
-    <div
-      id="status-hub"
-      className="fixed bottom-6 right-6 max-w-[320px] px-4 py-3 z-[2026] flex items-center gap-3 rounded-[14px] shadow-lg translate-x-0 transition-transform duration-600"
-      style={{
-        background: 'var(--glass-bg)',
-        backdropFilter: 'blur(16px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(16px) saturate(180%)',
-        border: '1px solid var(--glass-border)',
-        color: 'var(--text-primary)',
-      }}
-    >
-      <div
-        className="w-2 h-2 rounded-full animate-pulse"
-        style={{ background: 'var(--accent-orange)', boxShadow: '0 0 10px var(--accent-orange)' }}
-      />
-      <div className="flex-1">
-        <span className="text-[11px] uppercase tracking-[1px] opacity-50 block">System State</span>
-        <span className="text-sm font-medium block">Offline Mode</span>
+    <div id="status-hub" className="glass-panel" style={{
+      position: 'fixed',
+      bottom: '24px',
+      right: '24px',
+      maxWidth: '320px',
+      padding: '12px 16px',
+      zIndex: 2026,
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      borderRadius: '14px',
+      transform: 'translateX(0)',
+      transition: 'transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)',
+      color: '#FFFFFF',
+    }}>
+      <div style={{
+        width: 8, height: 8,
+        borderRadius: '50%',
+        background: 'var(--accent-orange)',
+        boxShadow: '0 0 10px var(--accent-orange)',
+        animation: 'pulse 2s infinite',
+      }} />
+      <div style={{ flex: 1 }}>
+        <span style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.5 }}>System State</span>
+        <span style={{ fontSize: 14, fontWeight: 500, display: 'block' }}>Offline Mode</span>
       </div>
       <button
-        className="flex-shrink-0 p-2 rounded-lg bg-white/5 hover:bg-white/15 transition-all cursor-pointer border-none text-white"
+        style={{
+          flexShrink: 0, padding: 8, borderRadius: 8,
+          background: 'rgba(255,255,255,0.05)',
+          border: 'none', cursor: 'pointer', color: '#FFFFFF',
+          transition: 'background 0.2s',
+        }}
         onClick={() => window.location.reload()}
         aria-label="Sync"
       >

@@ -1,17 +1,15 @@
 'use client'
 
-import { useRef, useEffect, useCallback } from 'react'
+import { useRef, useCallback } from 'react'
 import { usePlayer } from '@/context/PlayerContext'
 import { SurahCard } from './SurahCard'
-import { useI18n } from '@/context/I18nContext'
 
 interface CardScrollerProps {
   indices: number[]
 }
 
 export function CardScroller({ indices }: CardScrollerProps) {
-  const { quranData } = usePlayer()
-  const { translate } = useI18n()
+  const { quranData, launchPlayer } = usePlayer()
   const containerRef = useRef<HTMLDivElement>(null)
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -34,16 +32,7 @@ export function CardScroller({ indices }: CardScrollerProps) {
   }, [])
 
   return (
-    <div
-      ref={containerRef}
-      className="card-scroller flex gap-4 overflow-x-auto px-4 pb-8 scroll-smooth snap-x snap-mandatory"
-      onKeyDown={handleKeyDown}
-      style={{
-        paddingLeft: 'max(16px, env(safe-area-inset-left, 16px))',
-        paddingRight: 'max(16px, env(safe-area-inset-right, 16px))',
-        WebkitOverflowScrolling: 'touch',
-      }}
-    >
+    <div ref={containerRef} className="card-scroller" onKeyDown={handleKeyDown}>
       {indices.map(idx => {
         const surah = quranData[idx]
         if (!surah) return null
@@ -52,7 +41,7 @@ export function CardScroller({ indices }: CardScrollerProps) {
             key={surah.chapterNumber}
             chapterNumber={surah.chapterNumber}
             englishName={surah.english_name}
-            index={idx}
+            onClick={() => launchPlayer(surah.chapterNumber, 1)}
           />
         )
       })}

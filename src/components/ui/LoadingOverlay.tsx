@@ -17,40 +17,19 @@ export function LoadingOverlay() {
   if (!visible) return null
 
   return (
-    <div
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-500"
-      style={{ backgroundColor: 'var(--bg)' }}
-    >
-      <nav id="splash-footer" className="mb-20">
-        <h2 className="heroz-title-text font-display font-bold text-[clamp(34px,6vw,96px)] -tracking-[0.04em] text-[var(--text-primary)]">
-          {chapterTitle}
-        </h2>
+    <div id="loading-overlay">
+      <nav id="splash-footer">
+        <h2 className="heroz-title-text">{chapterTitle}</h2>
       </nav>
-      <div className="loader-content flex flex-col items-center">
-        <div
-          className="w-12 h-12 rounded-full mb-8"
-          style={{
-            border: '3px solid var(--glass-border)',
-            borderTopColor: 'var(--text-primary)',
-            animation: 'apple-spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite',
-          }}
-        />
-        <div className="loader-text text-lg text-[var(--text-secondary)]" id="loader-text">
+      <div className="loader-content">
+        <div className="loader-spinner" />
+        <div className="loader-text" id="loader-text" style={{ color: 'var(--text-secondary)', fontSize: 17, marginTop: 8 }}>
           {translate('loading.selectSurah')}
         </div>
-        <button
-          id="start-btn"
-          className="start-btn mt-8 px-10 py-4 rounded-full text-[1.6rem] font-semibold cursor-pointer transition-all duration-500"
-          style={{
-            background: 'var(--glass-bg)',
-            backdropFilter: 'var(--glass-vibrancy)',
-            WebkitBackdropFilter: 'var(--glass-vibrancy)',
-            border: '0.5px solid var(--glass-border)',
-            boxShadow: 'var(--shadow-elevated)',
-            color: 'var(--text-primary)',
-          }}
-          onClick={() => setVisible(false)}
-        >
+        <div className="splash-footer-description">
+          <p>Designed for Apple Users</p>
+        </div>
+        <button id="start-btn" className="start-btn" onClick={() => setVisible(false)}>
           {translate('player.start')}
         </button>
       </div>

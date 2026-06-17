@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { usePlayer } from '@/context/PlayerContext'
-import { useI18n } from '@/context/I18nContext'
 
 export function IslandSearch() {
   const [query, setQuery] = useState('')
@@ -10,8 +9,7 @@ export function IslandSearch() {
   const [isError, setIsError] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
-  const { launchPlayer, quranData } = usePlayer()
-  const { translate } = useI18n()
+  const { quranData } = usePlayer()
 
   const resetButton = useCallback(() => {
     const trigger = document.querySelector('.enter-trigger')
@@ -24,9 +22,10 @@ export function IslandSearch() {
 
   const highlightChapter = useCallback((chapterNum: number) => {
     document.querySelectorAll('.surah-card').forEach(c => {
-      ;(c as HTMLElement).style.transform = 'scale(1)'
-      ;(c as HTMLElement).style.filter = 'none'
-      ;(c as HTMLElement).style.boxShadow = 'none'
+      const el = c as HTMLElement
+      el.style.transform = ''
+      el.style.filter = ''
+      el.style.boxShadow = ''
     })
     const cards = Array.from(document.querySelectorAll('.surah-card'))
     const target = cards.find(card => {
@@ -34,15 +33,16 @@ export function IslandSearch() {
       return numDiv && numDiv.textContent?.trim() === String(chapterNum)
     })
     if (target) {
+      const el = target as HTMLElement
       target.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      ;(target as HTMLElement).style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-      ;(target as HTMLElement).style.transform = 'scale(1.1)'
-      ;(target as HTMLElement).style.filter = 'brightness(1.4)'
-      ;(target as HTMLElement).style.boxShadow = '0 0 25px rgba(209, 209, 214, 0.6)'
+      el.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+      el.style.transform = 'scale(1.1)'
+      el.style.filter = 'brightness(1.4)'
+      el.style.boxShadow = '0 0 25px rgba(209, 209, 214, 0.6)'
       setTimeout(() => {
-        ;(target as HTMLElement).style.transform = 'scale(1)'
-        ;(target as HTMLElement).style.filter = 'none'
-        ;(target as HTMLElement).style.boxShadow = 'none'
+        el.style.transform = ''
+        el.style.filter = ''
+        el.style.boxShadow = ''
       }, 9500)
     }
   }, [])
@@ -108,19 +108,9 @@ export function IslandSearch() {
   }, [query, executeSearch])
 
   return (
-    <div id="island-search-wrapper" className="fixed bottom-[max(40px,calc(env(safe-area-inset-bottom,0px)+16px))] left-[max(16px,env(safe-area-inset-left,16px))] flex items-center gap-4 pointer-events-none z-[9999]">
-      <div
-        className={`island-search-box pointer-events-auto relative z-10 flex items-center px-4 py-3 w-[280px] min-h-11 rounded-full shadow-floating transition-all duration-500 ${
-          isThinking ? 'ai-thinking' : ''
-        } ${isError ? 'island-error' : ''}`}
-        style={{
-          background: 'var(--glass-bg)',
-          backdropFilter: 'var(--glass-vibrancy)',
-          WebkitBackdropFilter: 'var(--glass-vibrancy)',
-          border: '0.5px solid var(--glass-border)',
-        }}
-      >
-        <div className="search-icon-wrapper flex items-center mr-3" style={{ color: 'var(--text-secondary)' }}>
+    <div id="island-search-wrapper">
+      <div className={`island-search-box ${isThinking ? 'ai-thinking' : ''} ${isError ? 'island-error' : ''}`}>
+        <div className="search-icon-wrapper">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
@@ -133,8 +123,6 @@ export function IslandSearch() {
           value={query}
           onChange={(e) => handleInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') handleTrigger() }}
-          className="bg-transparent border-none text-[17px] font-medium -tracking-[0.02em] w-full outline-none min-h-11"
-          style={{ color: 'var(--text-primary)' }}
           autoComplete="off"
           spellCheck={false}
         />
@@ -142,15 +130,7 @@ export function IslandSearch() {
 
       <button
         id="island-trigger"
-        className="enter-trigger w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 pointer-events-auto cursor-pointer transition-all duration-500 z-10"
-        style={{
-          background: 'var(--glass-bg)',
-          backdropFilter: 'var(--glass-vibrancy)',
-          WebkitBackdropFilter: 'var(--glass-vibrancy)',
-          border: '0.5px solid var(--glass-border)',
-          boxShadow: 'var(--shadow-elevated)',
-          color: 'var(--text-primary)',
-        }}
+        className="enter-trigger"
         onClick={handleTrigger}
         aria-label="Execute Search"
         tabIndex={0}
