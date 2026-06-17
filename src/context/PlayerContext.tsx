@@ -68,6 +68,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const currentLoadedChapter = useRef<number | null>(null)
   const isSeekingRef = useRef(false)
   const displayVerseRef = useRef<number | null>(null)
+  const currentTransRef = useRef(currentTrans)
+  useEffect(() => { currentTransRef.current = currentTrans }, [currentTrans])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -162,7 +164,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const updateTranslationText = useCallback((chNum: number, vNum: number) => {
-    const tid = currentTrans
+    const tid = currentTransRef.current
     const cache = translationCache.current[tid]
     if (!cache) return
     const el = document.getElementById('translation-text')
@@ -172,7 +174,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const sura = cache.querySelector(`sura[index="${chNum}"]`)
     const aya = sura ? sura.querySelector(`aya[index="${vNum}"]`) : null
     setTranslationText(aya ? aya.getAttribute('text') || '' : 'Translation unavailable')
-  }, [currentTrans])
+  }, [])
 
   const updateQuranAudio = useCallback(async (chNum: number, vNum: number, play: boolean) => {
     const audio = audioRef.current
@@ -271,7 +273,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
     const verseKey = `${chNum}-${vNum}`
     const isForbidden = forbiddenVerses.has(verseKey)
-    if (currentTrans && !translationCache.current[currentTrans]) await loadTranslationData(currentTrans)
+    const trans = currentTransRef.current
+    if (trans && !translationCache.current[trans]) await loadTranslationData(trans)
 
     if (!isForbidden) updateTranslationText(chNum, vNum)
     else { setTranslationText(''); const te = document.getElementById('translation-text'); if (te) te.textContent = '' }
@@ -279,7 +282,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     doSaveState()
     updateMediaSession(ch.english_name, vNum)
     bufferNextResources(currentChapterIdx, currentVerseIdx)
-  }, [quranData, currentChapterIdx, currentVerseIdx, currentReciter, currentTrans, forbiddenVerses, loadTranslationData, updateTranslationText, updateQuranAudio, doSaveState, bufferNextResources, updateMediaSession])
+  }, [quranData, currentChapterIdx, currentVerseIdx, currentReciter, forbiddenVerses, loadTranslationData, updateTranslationText, updateQuranAudio, doSaveState, bufferNextResources, updateMediaSession])
 
   const loadQuranData = useCallback(async () => {
     try {
@@ -422,14 +425,37 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     return () => evts.forEach(e => window.removeEventListener(e, handler))
   }, [])
 
-  // auto-load verse when state changes (must include all deps to avoid stale closure)
+  // auto-load verse when chapter/verse/reciter/audio-trans changes
   useEffect(() => {
     if (quranDataLoaded && view === 'cinema') {
-      loadTranslationData(currentTrans)
+      loadTranslationData(currentTransRef.current)
       loadVerse(true)
     }
-  }, [currentChapterIdx, currentVerseIdx, currentReciter, currentTrans, currentAudioTrans,
+  }, [currentChapterIdx, currentVerseIdx, currentReciter, currentAudioTrans,
       quranDataLoaded, view, loadVerse, loadTranslationData])
+
+  // translation-only change — update text without seeking audio
+  useEffect(() => {
+    if (!quranDataLoaded || view !== 'cinema') return
+    loadTranslationData(currentTrans)
+    const ch = quranData[currentChapterIdx]
+    if (!ch) return
+    const chNum = ch.chapterNumber
+    const vNum = displayVerseRef.current || ch.verses[currentVerseIdx]?.verseNumber || 1
+    const key = `${chNum}-${vNum}`
+    const tt = document.getElementById('translation-text')
+    if (forbiddenVerses.has(key)) {
+      if (tt) tt.textContent = ''
+    } else {
+      const cache = translationCache.current[currentTrans]
+      if (cache && tt) {
+        if (RTL_CODES.has(currentTrans)) tt.dir = 'rtl'; else tt.dir = 'ltr'
+        const sura = cache.querySelector(`sura[index="${chNum}"]`)
+        const aya = sura ? sura.querySelector(`aya[index="${vNum}"]`) : null
+        tt.textContent = aya ? aya.getAttribute('text') : ''
+      }
+    }
+  }, [currentTrans, quranDataLoaded, view])
 
   // vh on resize
   useEffect(() => {
