@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     description: 'Distraction-free Quran streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
     type: 'website',
     locale: 'en_US',
-    images: ['https://opentuwa.com/assets/ui/web_1200.png'],
+    images: ['https://muslim.opentuwa.com/assets/ui/web_1200.png'],
   },
   twitter: {
     card: 'summary_large_image',
@@ -48,11 +48,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="application-name" content="Tuwa" />
         <meta name="apple-mobile-web-app-orientations" content="portrait-primary" />
         <meta name="format-detection" content="telephone=no" />
-        <link rel="icon" type="image/png" href="https://opentuwa.com/assets/ui/favicon-96x96.png" sizes="96x96" />
-        <link rel="icon" type="image/svg+xml" href="https://opentuwa.com/assets/ui/favicon.svg" />
-        <link rel="shortcut icon" href="https://opentuwa.com/assets/ui/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="https://opentuwa.com/assets/ui/apple-touch-icon.png" />
-        <link rel="mask-icon" href="https://opentuwa.com/assets/ui/favicon.svg" color="#1C1C1E" />
+        <link rel="icon" type="image/png" href="https://muslim.opentuwa.com/assets/ui/favicon-96x96.png" sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="https://muslim.opentuwa.com/assets/ui/favicon.svg" />
+        <link rel="shortcut icon" href="https://muslim.opentuwa.com/assets/ui/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="https://muslim.opentuwa.com/assets/ui/apple-touch-icon.png" />
+        <link rel="mask-icon" href="https://muslim.opentuwa.com/assets/ui/favicon.svg" color="#1C1C1E" />
         <link type="text/plain" rel="author" href="humans.txt" />
         <link rel="preconnect" href="https://everyayah.com" />
         <link rel="preconnect" href="https://raw.githubusercontent.com" />
@@ -66,10 +66,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   '@type': 'WebSite',
                   name: 'Tuwa',
                   alternateName: 'Tuwa Quran Audio Player',
-                  url: 'https://opentuwa.com/',
+                  url: 'https://muslim.opentuwa.com/',
                   description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
-                  publisher: { '@type': 'Organization', name: 'Tuwa Media', url: 'https://opentuwa.com/', logo: { '@type': 'ImageObject', url: 'https://opentuwa.com/assets/ui/favicon-96x96.png' } },
-                  potentialAction: { '@type': 'SearchAction', target: { '@type': 'EntryPoint', urlTemplate: 'https://opentuwa.com/?search={search_term_string}' }, 'query-input': 'required name=search_term_string' },
+                  publisher: { '@type': 'Organization', name: 'Tuwa Media', url: 'https://muslim.opentuwa.com/', logo: { '@type': 'ImageObject', url: 'https://muslim.opentuwa.com/assets/ui/favicon-96x96.png' } },
+                  potentialAction: { '@type': 'SearchAction', target: { '@type': 'EntryPoint', urlTemplate: 'https://muslim.opentuwa.com/?search={search_term_string}' }, 'query-input': 'required name=search_term_string' },
                   inLanguage: 'en-US',
                 },
                 {
@@ -79,7 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   applicationCategory: 'MusicApplication',
                   operatingSystem: 'Web, iOS, tvOS, Android',
                   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', availability: 'https://schema.org/InStock' },
-                  author: { '@type': 'Organization', name: 'Tuwa Media', url: 'https://opentuwa.com/' },
+                  author: { '@type': 'Organization', name: 'Tuwa Media', url: 'https://muslim.opentuwa.com/' },
                   description: 'Distraction-free Quran streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
                   aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.8', ratingCount: '32000000', bestRating: '5', worstRating: '1' },
                 },

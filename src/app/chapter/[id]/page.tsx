@@ -1,13 +1,10 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { SURAH_METADATA } from '@/lib/surah-metadata'
 import { ChapterClient } from './chapter-client'
 
-const siteUrl = 'https://opentuwa.com'
-
-export async function generateStaticParams() {
-  return SURAH_METADATA.map(s => ({ id: s.chapter.toString() }))
-}
+const siteUrl = 'https://muslim.opentuwa.com'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params
@@ -28,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       type: 'website',
       locale: 'en_US',
       url,
-      images: [{ url: 'https://opentuwa.com/assets/ui/web_1200.png', width: 1200, height: 630 }],
+      images: [{ url: `${siteUrl}/assets/ui/web_1200.png`, width: 1200, height: 630 }],
     },
     twitter: {
       card: 'summary_large_image',
@@ -42,6 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 }
 
 export default async function ChapterPage({ params }: { params: Promise<{ id: string }> }) {
+  await cookies()
   const { id: idStr } = await params
   const id = parseInt(idStr)
   const ch = SURAH_METADATA.find(s => s.chapter === id)

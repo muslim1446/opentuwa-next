@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { SURAH_METADATA } from '@/lib/surah-metadata'
+import { cookies } from 'next/headers'
 import HomeClient from './home-client'
 
-const siteUrl = 'https://opentuwa.com'
+const siteUrl = 'https://muslim.opentuwa.com'
 
 const description = 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations. Built for deep focus.'
 
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: siteUrl,
-    images: [{ url: 'https://opentuwa.com/assets/ui/web_1200.png', width: 1200, height: 630 }],
+    images: [{ url: `${siteUrl}/assets/ui/web_1200.png`, width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -30,7 +31,8 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  await cookies()
   const surahCount = SURAH_METADATA.length
   const jsonLd = {
     '@context': 'https://schema.org',

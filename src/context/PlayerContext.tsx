@@ -239,7 +239,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       title: surah,
       artist: 'The Sight | Original Series',
       album: 'Tuwa Audio',
-      artwork: [{ src: 'https://opentuwa.com/social-preview.jpg', sizes: '512x512', type: 'image/jpeg' }]
+      artwork: [{ src: 'https://muslim.opentuwa.com/social-preview.jpg', sizes: '512x512', type: 'image/jpeg' }]
     })
   }, [])
 
