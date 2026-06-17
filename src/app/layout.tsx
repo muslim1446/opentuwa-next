@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { Providers } from './providers'
+import { ClientInit } from './client-init'
 
 export const metadata: Metadata = {
   title: 'Tuwa - Premium Quran Audio Player',
@@ -41,10 +42,9 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" dir="auto" prefix="og: http://ogp.me/ns# book: http://ogp.me/ns/book#" suppressHydrationWarning>
+    <html lang="en" dir="auto" suppressHydrationWarning>
       <head>
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />
         <meta name="application-name" content="Tuwa" />
         <meta name="apple-mobile-web-app-orientations" content="portrait-primary" />
         <meta name="format-detection" content="telephone=no" />
@@ -52,9 +52,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" type="image/svg+xml" href="https://opentuwa.com/assets/ui/favicon.svg" />
         <link rel="shortcut icon" href="https://opentuwa.com/assets/ui/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="https://opentuwa.com/assets/ui/apple-touch-icon.png" />
-        <link rel="apple-touch-icon" sizes="152x152" href="https://opentuwa.com/assets/ui/apple-touch-icon.png" />
-        <link rel="apple-touch-icon" sizes="120x120" href="https://opentuwa.com/assets/ui/apple-touch-icon.png" />
-        <link rel="apple-touch-icon" sizes="76x76" href="https://opentuwa.com/assets/ui/apple-touch-icon.png" />
         <link rel="mask-icon" href="https://opentuwa.com/assets/ui/favicon.svg" color="#1C1C1E" />
         <link type="text/plain" rel="author" href="humans.txt" />
         <link rel="preconnect" href="https://everyayah.com" />
@@ -90,23 +87,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }),
           }}
         />
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            window.addEventListener('DOMContentLoaded', () => {
-              const u = new URLSearchParams(window.location.search);
-              if (u.has('regex')) { document.querySelectorAll('.app-brand').forEach(e => e.style.setProperty('display','none','important')); }
-            });
-            (function(){if(!navigator.serviceWorker)return;window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){})})})();
-            (function(){document.addEventListener('contextmenu',function(e){e.preventDefault()});document.addEventListener('copy',function(e){e.preventDefault()});document.addEventListener('dragstart',function(e){e.preventDefault()})})();
-            (function(){var o=new MutationObserver(function(){document.querySelectorAll('*').forEach(function(n){var c=n.childNodes;for(var i=0;i<c.length;i++){if(c[i].nodeType===3){c[i].textContent=c[i].textContent.replace(/[\\$€£¥₩₽₨₪₸₴₦]/g,'')}}});});o.observe(document.documentElement,{childList:true,subtree:true,characterData:true})})();
-            (function(){var s=document.createElement('style');s.textContent='@keyframes eyeFadeActive{0%{opacity:0}100%{opacity:1}}.eye-fade-active{animation:eyeFadeActive 0.5s ease-out both}';document.head.appendChild(s);var o=new MutationObserver(function(){document.querySelectorAll('*').forEach(function(n){if(n.nodeType===1&&!n.classList.contains('eye-fade-active')){n.classList.add('eye-fade-active')}})});o.observe(document.documentElement,{childList:true,subtree:true})})();
-            (function(){if(window.location.hostname.includes('github.io')){window.location.replace('https://opentuwa.pages.dev'+window.location.pathname+window.location.search)}})();
-          `
-        }} />
       </head>
       <body className="home">
         <div id="transition-fade-layer" />
         <Providers>
+          <ClientInit />
           {children}
         </Providers>
       </body>
