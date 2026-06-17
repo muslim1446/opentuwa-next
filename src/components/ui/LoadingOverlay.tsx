@@ -1,6 +1,10 @@
 'use client'
 
-export function LoadingOverlay() {
+interface LoadingOverlayProps {
+  onStart?: () => void
+}
+
+export function LoadingOverlay({ onStart }: LoadingOverlayProps) {
   return (
     <div id="loading-overlay">
       <nav id="splash-footer">
@@ -9,7 +13,7 @@ export function LoadingOverlay() {
       <div className="loader-content">
         <div className="loader-spinner" />
         <div className="loader-text" id="loader-text" />
-        <button id="start-btn" className="start-btn" data-i18n="player.start">
+        <button id="start-btn" className="start-btn" data-i18n="player.start" onClick={onStart}>
           Start
         </button>
       </div>

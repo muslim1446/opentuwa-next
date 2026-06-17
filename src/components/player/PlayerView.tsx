@@ -15,7 +15,7 @@ export function PlayerView() {
     currentReciter, currentTrans, currentAudioTrans,
     translationText, chapterTitle, isPlaying,
     setChapter, setVerse, setReciter, setTrans, setAudioTrans,
-    nextVerse, prevVerse,
+    nextVerse, prevVerse, startPlayback,
   } = usePlayer()
   const { translate } = useI18n()
 
@@ -51,7 +51,7 @@ export function PlayerView() {
 
   return (
     <div id="cinema-view" className={view === 'cinema' ? 'active' : ''}>
-      <LoadingOverlay />
+      <LoadingOverlay onStart={startPlayback} />
 
       <div className="container">
         <audio id="audio-player" crossOrigin="anonymous" />
