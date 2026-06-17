@@ -12,6 +12,12 @@ import {
 import { encodeStream, decodeStream, loadState, saveState, getBrowserLang } from '@/lib/stream-utils'
 import { getChapterTiming } from '@/lib/timing'
 
+interface FocusedSurah {
+  chapterNum: number
+  englishName: string
+  description?: string
+}
+
 interface PlayerContextType {
   view: ViewType; setView: (v: ViewType) => void
   quranData: ChapterData[]; quranDataLoaded: boolean
@@ -21,6 +27,7 @@ interface PlayerContextType {
   isPlaying: boolean; isBuffering: boolean
   volume: number; isMuted: boolean; isIdle: boolean
   forbiddenVerses: Set<string>; timingData: TimingData | null
+  focusedSurah: FocusedSurah | null; setFocusedSurah: (f: FocusedSurah | null) => void
   setChapter: (idx: number) => void; setVerse: (idx: number) => void
   setReciter: (id: string) => void; setTrans: (id: string) => void
   setAudioTrans: (id: string) => void
@@ -51,6 +58,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [isIdle, setIsIdle] = useState(false)
   const [forbiddenVerses, setForbiddenVerses] = useState<Set<string>>(new Set())
   const [timingData, setTimingData] = useState<TimingData | null>(null)
+  const [focusedSurah, setFocusedSurah] = useState<FocusedSurah | null>(null)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const transAudioRef = useRef<HTMLAudioElement | null>(null)
@@ -296,12 +304,21 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     else { audio.pause(); setIsPlaying(false) }
   }, [])
 
+  const goToNextChapter = useCallback(() => {
+    if (currentChapterIdx + 1 < quranData.length) {
+      setCurrentChapterIdx(currentChapterIdx + 1)
+    } else {
+      setCurrentChapterIdx(0)
+    }
+    setCurrentVerseIdx(0)
+  }, [quranData, currentChapterIdx])
+
   const nextVerse = useCallback(() => {
     const ch = quranData[currentChapterIdx]
     if (!ch) return
     if (currentVerseIdx + 1 < ch.verses.length) setCurrentVerseIdx(currentVerseIdx + 1)
-    else if (currentChapterIdx + 1 < quranData.length) { setCurrentChapterIdx(currentChapterIdx + 1); setCurrentVerseIdx(0) }
-  }, [quranData, currentChapterIdx, currentVerseIdx])
+    else goToNextChapter()
+  }, [quranData, currentChapterIdx, currentVerseIdx, goToNextChapter])
 
   const prevVerse = useCallback(() => {
     if (currentVerseIdx > 0) setCurrentVerseIdx(currentVerseIdx - 1)
@@ -373,14 +390,14 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     return () => audio.removeEventListener('timeupdate', onTimeUpdate)
   }, [currentChapterIdx, currentTrans, quranData, forbiddenVerses, doSaveState, updateMediaSession])
 
-  // audio ended -> next verse
+  // audio ended -> next chapter (or loop 114 -> 1)
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
-    const ended = () => nextVerse()
+    const ended = () => goToNextChapter()
     audio.addEventListener('ended', ended)
     return () => audio.removeEventListener('ended', ended)
-  }, [nextVerse])
+  }, [goToNextChapter])
 
   // sync play/pause state
   useEffect(() => {
@@ -431,6 +448,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       translationText, chapterTitle,
       isPlaying, isBuffering, volume, isMuted, isIdle,
       forbiddenVerses, timingData,
+      focusedSurah, setFocusedSurah,
       setChapter: setCurrentChapterIdx, setVerse: setCurrentVerseIdx,
       setReciter: setCurrentReciter, setTrans: setCurrentTrans, setAudioTrans: setCurrentAudioTrans,
       togglePlayPause, nextVerse, prevVerse,

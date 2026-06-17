@@ -3,10 +3,12 @@
 interface SurahCardProps {
   chapterNumber: number
   englishName: string
+  description?: string
   onClick: () => void
+  onFocus?: () => void
 }
 
-export function SurahCard({ chapterNumber, englishName, onClick }: SurahCardProps) {
+export function SurahCard({ chapterNumber, englishName, description, onClick, onFocus }: SurahCardProps) {
   return (
     <div
       className="surah-card"
@@ -14,6 +16,7 @@ export function SurahCard({ chapterNumber, englishName, onClick }: SurahCardProp
       tabIndex={0}
       aria-label={englishName}
       onClick={onClick}
+      onFocus={onFocus}
       onKeyDown={(e) => { if (e.key === 'Enter') onClick() }}
     >
       <div className="card-bg-num">

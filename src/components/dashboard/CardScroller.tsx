@@ -9,7 +9,7 @@ interface CardScrollerProps {
 }
 
 export function CardScroller({ indices }: CardScrollerProps) {
-  const { quranData, launchPlayer } = usePlayer()
+  const { quranData, launchPlayer, setFocusedSurah } = usePlayer()
   const containerRef = useRef<HTMLDivElement>(null)
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -41,7 +41,13 @@ export function CardScroller({ indices }: CardScrollerProps) {
             key={surah.chapterNumber}
             chapterNumber={surah.chapterNumber}
             englishName={surah.english_name}
-            onClick={() => launchPlayer(surah.chapterNumber, 1)}
+            description={surah.description}
+            onClick={() => { setFocusedSurah(null); launchPlayer(surah.chapterNumber, 1) }}
+            onFocus={() => setFocusedSurah({
+              chapterNum: surah.chapterNumber,
+              englishName: surah.english_name,
+              description: surah.description,
+            })}
           />
         )
       })}
