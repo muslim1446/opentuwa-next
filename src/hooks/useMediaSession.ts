@@ -16,7 +16,7 @@ export function useMediaSession(
       album: 'Tuwa Audio',
       artwork: [
         {
-          src: 'https://muslim.opentuwa.com/assets/ui/web_1200.png',
+          src: 'https://opentuwa.com/assets/ui/web_1200.png',
           sizes: '512x512',
           type: 'image/png',
         },

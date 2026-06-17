@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: siteUrl,
-    images: [{ url: `${siteUrl}/assets/ui/web_1200.png`, width: 1200, height: 630 }],
+    images: [{ url: `https://opentuwa.com/assets/ui/web_1200.png`, width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
