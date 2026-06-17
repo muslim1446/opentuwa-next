@@ -70,6 +70,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const displayVerseRef = useRef<number | null>(null)
   const currentTransRef = useRef(currentTrans)
   useEffect(() => { currentTransRef.current = currentTrans }, [currentTrans])
+  const currentReciterRef = useRef(currentReciter)
+  useEffect(() => { currentReciterRef.current = currentReciter }, [currentReciter])
+  const currentAudioTransRef = useRef(currentAudioTrans)
+  useEffect(() => { currentAudioTransRef.current = currentAudioTrans }, [currentAudioTrans])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -213,18 +217,21 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const doSaveState = useCallback((override?: { chapterIdx?: number; verseIdx?: number }) => {
     const chIdx = override?.chapterIdx ?? currentChapterIdx
     const vIdx = override?.verseIdx ?? currentVerseIdx
+    const reciter = currentReciterRef.current
+    const trans = currentTransRef.current
+    const audioTrans = currentAudioTransRef.current
     saveState({
       chapter: chIdx, verse: vIdx,
-      reciter: currentReciter, trans: currentTrans, audio_trans: currentAudioTrans,
+      reciter, trans, audio_trans: audioTrans,
     })
     const ch = quranData[chIdx]
     if (!ch) return
     const chNum = ch.chapterNumber
     const vNum = ch.verses[vIdx]?.verseNumber || 1
-    const token = encodeStream(chNum, vNum, currentReciter, currentTrans, currentAudioTrans)
+    const token = encodeStream(chNum, vNum, reciter, trans, audioTrans)
     const newUrl = `?stream=${token}`
     if (typeof window !== 'undefined') window.history.replaceState({ path: newUrl, view: 'cinema' }, '', newUrl)
-  }, [currentChapterIdx, currentVerseIdx, currentReciter, currentTrans, currentAudioTrans, quranData])
+  }, [currentChapterIdx, currentVerseIdx, quranData])
 
   const updateMediaSession = useCallback((surah: string, verse: number) => {
     if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return
@@ -341,9 +348,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     setCurrentChapterIdx(chapterNum - 1)
     setCurrentVerseIdx(verseNum - 1)
     setView('cinema')
-    const token = encodeStream(chapterNum, verseNum, currentReciter, currentTrans, currentAudioTrans)
+    const token = encodeStream(chapterNum, verseNum, currentReciterRef.current, currentTransRef.current, currentAudioTransRef.current)
     if (typeof window !== 'undefined') window.history.pushState({ view: 'cinema', stream: token }, '', `?stream=${token}`)
-  }, [currentReciter, currentTrans, currentAudioTrans])
+  }, [])
 
   const startPlayback = useCallback(() => {
     const overlay = document.getElementById('loading-overlay')
