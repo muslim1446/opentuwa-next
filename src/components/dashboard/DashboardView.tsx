@@ -3,7 +3,6 @@
 import { usePlayer } from '@/context/PlayerContext'
 import { HeroBanner } from './HeroBanner'
 import { CardScroller } from './CardScroller'
-import { SearchOverlay } from './SearchOverlay'
 
 export function DashboardView() {
   const { quranData } = usePlayer()
@@ -14,18 +13,17 @@ export function DashboardView() {
     <>
       <HeroBanner />
 
-      <div className="row-section" id="continue-listening-row">
-        <div className="row-header" style={{ marginLeft: 'max(16px, env(safe-area-inset-left, 16px))' }}>
+      <div className="row-section row-section-hidden" id="continue-section">
+        <div className="row-header" data-i18n="dashboard.continueListening">
           Continue Listening
         </div>
         <CardScroller indices={trendingIndices} />
       </div>
 
-      <div className="row-section row-section-padding-bottom" id="all-surahs-row">
+      <div className="row-section row-section-padding-bottom">
+        <div className="row-header" />
         <CardScroller indices={allIndices} />
       </div>
-
-      <SearchOverlay />
     </>
   )
 }

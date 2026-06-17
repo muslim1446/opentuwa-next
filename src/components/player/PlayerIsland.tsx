@@ -20,7 +20,7 @@ export function PlayerIsland() {
       <div className="island-left">
         <a href="/" className="app-brand" aria-label="Tuwa Home">
           <span className="brand-icon">
-            <img src="https://opentuwa.com/assets/ui/favicon.svg" alt="" width={22} height={22} />
+            <img src="https://opentuwa.com/assets/ui/favicon.svg" alt="" width="44" height="44" />
           </span>
           <span className="brand-text">Tuwa</span>
         </a>

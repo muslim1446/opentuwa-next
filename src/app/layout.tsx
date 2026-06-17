@@ -89,11 +89,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="home">
-        <div id="transition-fade-layer" />
         <Providers>
           <ClientInit />
           {children}
         </Providers>
+        <div id="transition-fade-layer" />
       </body>
     </html>
   )

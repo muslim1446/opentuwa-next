@@ -54,6 +54,8 @@ export function PlayerView() {
       <LoadingOverlay />
 
       <div className="container">
+        <audio id="audio-player" crossOrigin="anonymous" />
+        <audio id="translation-audio-player" crossOrigin="anonymous" />
         <h1 id="chapter-title">
           {chapter?.title} ({chNum}:{vNum})
         </h1>
@@ -97,10 +99,6 @@ export function PlayerView() {
       </div>
 
       <PlayerIsland />
-
-      <audio id="audio-player" crossOrigin="anonymous" />
-      <audio id="translation-audio-player" crossOrigin="anonymous" />
-      <audio id="preview-audio" crossOrigin="anonymous" />
     </div>
   )
 }

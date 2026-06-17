@@ -8,11 +8,8 @@ export function HeroBanner() {
   return (
     <div className="hero-banner">
       <div className="hero-shadow-overlay" />
+      <div id="hero-subtitle-overlay" />
       <div className="hero-content">
-        <div className="hero-super">
-          <span>Premium Audio</span>
-          <span className="badge" id="resolution-badge">FHD</span>
-        </div>
         <h1 id="door-hero-title" className="hero-title-text">
           Tuwa
         </h1>
