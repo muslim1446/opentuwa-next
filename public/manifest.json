@@ -1,0 +1,35 @@
+{
+  "name": "Tuwa - Premium Quran Audio",
+  "short_name": "Tuwa",
+  "description": "Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.",
+  "start_url": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "browser"],
+  "background_color": "#1C1C1E",
+  "theme_color": "#1C1C1E",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": ["education", "books", "music"],
+  "lang": "en-US",
+  "dir": "auto",
+  "icons": [
+    { "src": "https://opentuwa.com/assets/ui/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any maskable" },
+    { "src": "https://opentuwa.com/assets/ui/favicon-96x96.png", "sizes": "96x96", "type": "image/png", "purpose": "any" },
+    { "src": "https://opentuwa.com/assets/ui/favicon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "https://opentuwa.com/assets/ui/favicon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Surah Al-Fatiha",
+      "short_name": "Al-Fatiha",
+      "description": "Listen to Surah Al-Fatiha (The Opening)",
+      "url": "/?stream=eyJjaGFwdGVyIjoxLCJ2ZXJzZSI6MSwicmVjaXRlciI6ImFsYWZhc3kiLCJ0cmFucyI6ImVuIiwiYXVkaW9fdHJhbnMiOiJub25lIn0"
+    },
+    {
+      "name": "Surah Al-Baqarah",
+      "short_name": "Al-Baqarah",
+      "description": "Listen to Surah Al-Baqarah (The Cow)",
+      "url": "/?stream=eyJjaGFwdGVyIjoyLCJ2ZXJzZSI6MSwicmVjaXRlciI6ImFsYWZhc3kiLCJ0cmFucyI6ImVuIiwiYXVkaW9fdHJhbnMiOiJub25lIn0"
+    }
+  ]
+}

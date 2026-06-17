@@ -1,0 +1,12 @@
+{
+  "meta": { "title": "Quran for Every Soul - Audio del Corán en línea", "description": "Lee y escucha el Noble Corán en línea.", "siteName": "Quran for Every Soul", "ogTitle": "Quran for Every Soul - El reproductor del Corán sin distracciones", "ogDescription": "Escucha el Noble Corán verso por verso." },
+  "nav": { "home": "Inicio", "search": "Buscar", "profile": "Perfil" },
+  "hero": { "super": "", "title": "", "subtitle": "", "resume": "Reanudar", "audioHd": "AUDIO HD" },
+  "dashboard": { "continueListening": "Continuar escuchando", "topResults": "Mejores resultados", "useKeyboard": "Usa el teclado para describir un tema...", "searching": "Buscando..." },
+  "search": { "voiceSearch": "Búsqueda por voz" },
+  "player": { "title": "Quran for Every Soul", "selectSurah": "Selecciona una Sura...", "selectSurahButton": "Seleccionar Sura", "ayah": "Aleya", "reciter": "Recitador", "translation": "Traducción", "audioTrans": "Audio Traducción", "start": "Comenzar", "continue": "Continuar", "buffering": "Cargando...", "suraName": "Nombre de la Sura", "suraNameMeaning": "Significado del nombre", "player.noAudioTranslation": "Sin traducción de audio" },
+  "card": { "subtitleLabel": "Título en árabe" },
+  "quickAccess": { "title": "Acceso rápido", "footerDescription": "Quran for Every Soul: Reproductor sin distracciones." },
+  "errors": { "loadError": "Error al cargar el contenido.", "translationUnavailable": "Traducción no disponible", "userDataWiped": "Datos de usuario eliminados." },
+  "loading": { "selectSurah": "Selecciona una Sura..." }
+}

@@ -1,0 +1,11 @@
+# TEAM
+Developer: Haykal M. Zaidi
+Site: https://opentuwa.com
+
+# SITE
+Language: English, Arabic, Spanish, French, Hebrew, Chinese
+Standards: HTML5, CSS3, JavaScript ES6+
+Backwards Compatibility: Graceful degradation for legacy browsers
+
+# UPDATED
+Date: 2026-06-17
