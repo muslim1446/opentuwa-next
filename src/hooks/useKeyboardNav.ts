@@ -59,6 +59,10 @@ export function useKeyboardNav() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (['ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        const active = document.activeElement
+        if (active && active.closest('.card-scroller')) return
+      }
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
         e.preventDefault()
         navigate(e.key)
