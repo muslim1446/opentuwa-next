@@ -345,11 +345,16 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const launchPlayer = useCallback((chapterNum: number, verseNum = 1) => {
-    setCurrentChapterIdx(chapterNum - 1)
-    setCurrentVerseIdx(verseNum - 1)
-    setView('cinema')
-    const token = encodeStream(chapterNum, verseNum, currentReciterRef.current, currentTransRef.current, currentAudioTransRef.current)
-    if (typeof window !== 'undefined') window.history.pushState({ view: 'cinema', stream: token }, '', `?stream=${token}`)
+    const fade = document.getElementById('transition-fade-layer')
+    if (fade) fade.classList.add('active')
+    setTimeout(() => {
+      setCurrentChapterIdx(chapterNum - 1)
+      setCurrentVerseIdx(verseNum - 1)
+      setView('cinema')
+      const token = encodeStream(chapterNum, verseNum, currentReciterRef.current, currentTransRef.current, currentAudioTransRef.current)
+      if (typeof window !== 'undefined') window.history.pushState({ view: 'cinema', stream: token }, '', `?stream=${token}`)
+      setTimeout(() => { if (fade) fade.classList.remove('active') }, 300)
+    }, 200)
   }, [])
 
   const startPlayback = useCallback(() => {
