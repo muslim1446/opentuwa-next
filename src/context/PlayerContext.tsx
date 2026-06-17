@@ -59,6 +59,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const timingCache = useRef<Record<number, TimingData>>({})
   const currentLoadedChapter = useRef<number | null>(null)
   const isSeekingRef = useRef(false)
+  const displayVerseRef = useRef<number | null>(null)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -199,15 +200,17 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const doSaveState = useCallback(() => {
+  const doSaveState = useCallback((override?: { chapterIdx?: number; verseIdx?: number }) => {
+    const chIdx = override?.chapterIdx ?? currentChapterIdx
+    const vIdx = override?.verseIdx ?? currentVerseIdx
     saveState({
-      chapter: currentChapterIdx, verse: currentVerseIdx,
+      chapter: chIdx, verse: vIdx,
       reciter: currentReciter, trans: currentTrans, audio_trans: currentAudioTrans,
     })
-    const ch = quranData[currentChapterIdx]
+    const ch = quranData[chIdx]
     if (!ch) return
     const chNum = ch.chapterNumber
-    const vNum = ch.verses[currentVerseIdx]?.verseNumber || 1
+    const vNum = ch.verses[vIdx]?.verseNumber || 1
     const token = encodeStream(chNum, vNum, currentReciter, currentTrans, currentAudioTrans)
     const newUrl = `?stream=${token}`
     if (typeof window !== 'undefined') window.history.replaceState({ path: newUrl, view: 'cinema' }, '', newUrl)
@@ -328,7 +331,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     loadVerse(true)
   }, [loadVerse])
 
-  // timeupdate: auto-advance verse during playback (app.js lines 1412-1453)
+  // timeupdate: UI-only verse display update (no seek) — matches app.js lines 1412-1453
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
@@ -343,24 +346,32 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       const currentMs = audio.currentTime * 1000
       const match = tData.verses.find(v => currentMs >= v.start_time_ms && currentMs < v.end_time_ms)
       if (!match) return
-      const curVNum = ch.verses[currentVerseIdx]?.verseNumber
-      if (curVNum !== match.verse) {
-        const newIdx = ch.verses.findIndex(v => v.verseNumber === match.verse)
-        if (newIdx !== -1) {
-          setCurrentVerseIdx(newIdx)
-          const te = document.getElementById('chapter-title')
-          if (te) te.innerHTML = `${ch.title} <span class="chapter-subtitle">(${chNum}:${match.verse})</span>`
-          const key = `${chNum}-${match.verse}`
-          if (forbiddenVerses.has(key)) setTranslationText('')
-          else updateTranslationText(chNum, match.verse)
-          doSaveState()
-          updateMediaSession(ch.english_name, match.verse)
+      if (match.verse === displayVerseRef.current) return
+      displayVerseRef.current = match.verse
+      const te = document.getElementById('chapter-title')
+      if (te) te.innerHTML = `${ch.title} <span class="chapter-subtitle">(${chNum}:${match.verse})</span>`
+      const key = `${chNum}-${match.verse}`
+      const forbidden = forbiddenVerses.has(key)
+      const tt = document.getElementById('translation-text')
+      if (forbidden) {
+        if (tt) tt.textContent = ''
+      } else {
+        const tid = currentTrans
+        const cache = translationCache.current[tid]
+        if (cache && tt) {
+          if (RTL_CODES.has(tid)) tt.dir = 'rtl'; else tt.dir = 'ltr'
+          const sura = cache.querySelector(`sura[index="${chNum}"]`)
+          const aya = sura ? sura.querySelector(`aya[index="${match.verse}"]`) : null
+          tt.textContent = aya ? aya.getAttribute('text') : ''
         }
       }
+      const vIdx = ch.verses.findIndex(v => v.verseNumber === match.verse)
+      doSaveState({ chapterIdx: chIdx, verseIdx: vIdx >= 0 ? vIdx : 0 })
+      updateMediaSession(ch.english_name, match.verse)
     }
     audio.addEventListener('timeupdate', onTimeUpdate)
     return () => audio.removeEventListener('timeupdate', onTimeUpdate)
-  }, [currentChapterIdx, currentVerseIdx, quranData, forbiddenVerses, updateTranslationText, doSaveState, updateMediaSession])
+  }, [currentChapterIdx, currentTrans, quranData, forbiddenVerses, doSaveState, updateMediaSession])
 
   // audio ended -> next verse
   useEffect(() => {
