@@ -3,30 +3,19 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { EQ_BANDS } from '@/lib/configs'
 
-interface EQBand {
-  label: string
-  freq: number
-  type: 'lowshelf' | 'peaking' | 'highshelf'
-  Q: number
-}
-
 const LS_KEY = 'tuwa_eq_v1'
 
 function loadGains(): Record<number, number> {
-  try {
-    return JSON.parse(localStorage.getItem(LS_KEY) || '{}')
-  } catch {
-    return {}
-  }
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}') }
+  catch { return {} }
 }
 
 function saveGains(gains: Record<number, number>) {
-  try {
-    localStorage.setItem(LS_KEY, JSON.stringify(gains))
-  } catch {}
+  try { localStorage.setItem(LS_KEY, JSON.stringify(gains)) }
+  catch {}
 }
 
-function formatGain(g: number): string {
+function formatGain(g: number) {
   return `${g >= 0 ? '+' : ''}${g.toFixed(1)} dB`
 }
 
@@ -34,6 +23,82 @@ export function EQPopup() {
   const [isOpen, setIsOpen] = useState(false)
   const [gains, setGains] = useState<Record<number, number>>(loadGains)
   const backdropRef = useRef<HTMLDivElement>(null)
+
+  // EQ engine refs (persist across renders)
+  const audioCtxRef = useRef<AudioContext | null>(null)
+  const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null)
+  const filterNodesRef = useRef<BiquadFilterNode[]>([])
+  const eqConnectedRef = useRef(false)
+  const sliderElsRef = useRef<HTMLInputElement[]>([])
+
+  // Build the Web Audio EQ chain (idempotent)
+  const ensureEQ = useCallback(() => {
+    if (eqConnectedRef.current) {
+      if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+        audioCtxRef.current.resume()
+      }
+      return true
+    }
+    const audioEl = document.getElementById('audio-player') as HTMLAudioElement | null
+    if (!audioEl) return false
+    try {
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
+      }
+      if (audioCtxRef.current.state === 'suspended') audioCtxRef.current.resume()
+      if (!sourceNodeRef.current) {
+        sourceNodeRef.current = audioCtxRef.current.createMediaElementSource(audioEl)
+      }
+      const saved = loadGains()
+      filterNodesRef.current = EQ_BANDS.map((band, i) => {
+        const f = audioCtxRef.current!.createBiquadFilter()
+        f.type = band.type
+        f.frequency.value = band.freq
+        f.Q.value = band.Q
+        f.gain.value = (saved[i] !== undefined) ? saved[i] : 0
+        return f
+      })
+      let prev: AudioNode = sourceNodeRef.current
+      filterNodesRef.current.forEach(f => { prev.connect(f); prev = f })
+      prev.connect(audioCtxRef.current.destination)
+      eqConnectedRef.current = true
+      return true
+    } catch (e) {
+      console.warn('[Tuwa EQ] Web Audio setup failed:', e)
+      return false
+    }
+  }, [])
+
+  // Apply current gain values to live filter nodes
+  const applyGains = useCallback((g: Record<number, number>) => {
+    if (!eqConnectedRef.current) return
+    filterNodesRef.current.forEach((f, i) => {
+      f.gain.value = (g[i] !== undefined) ? g[i] : 0
+    })
+  }, [])
+
+  // Collect gain values from slider DOM elements
+  const gainsFromSliders = useCallback(() => {
+    return sliderElsRef.current.map(s => parseFloat(s.value))
+  }, [])
+
+  // Expose initEQ on window so PlayerContext can call it on each verse play
+  useEffect(() => {
+    const initEQ = () => {
+      const ok = ensureEQ()
+      if (ok) {
+        const sliders = gainsFromSliders()
+        applyGains(sliders.length ? Object.fromEntries(sliders.map((v, i) => [i, v])) : loadGains())
+      }
+    }
+    ;(window as any).initEQ = initEQ
+    return () => { delete (window as any).initEQ }
+  }, [ensureEQ, applyGains, gainsFromSliders])
+
+  // When gains change from slider interaction, apply to filters
+  useEffect(() => {
+    applyGains(gains)
+  }, [gains, applyGains])
 
   const handleSliderChange = useCallback((index: number, value: number) => {
     setGains(prev => {
@@ -60,12 +125,13 @@ export function EQPopup() {
     <>
       <button
         id="eq-btn"
-        className={`player-btn w-11 h-11 rounded-full flex items-center justify-center cursor-pointer border-none transition-all duration-200 ${
-          isOpen ? 'eq-active' : ''
-        }`}
+        className={'player-btn' + (isOpen ? ' eq-active' : '')}
         style={{
+          position: 'relative', background: 'transparent', border: 'none',
+          cursor: 'pointer', width: 44, height: 44, borderRadius: '50%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: isOpen ? 'var(--text-primary)' : 'var(--text-secondary)',
-          background: 'transparent',
+          transition: 'color 0.2s',
         }}
         onClick={() => setIsOpen(prev => !prev)}
         aria-label="Equalizer"
@@ -84,40 +150,43 @@ export function EQPopup() {
         <div
           ref={backdropRef}
           id="eq-backdrop"
-          className="eq-open fixed inset-0 z-[9998] flex items-end justify-center"
           style={{
-            background: 'rgba(0,0,0,0.35)',
-            backdropFilter: 'blur(4px)',
+            display: 'flex', position: 'fixed', inset: 0, zIndex: 9998,
+            background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(4px)',
             WebkitBackdropFilter: 'blur(4px)',
+            alignItems: 'flex-end', justifyContent: 'center',
             paddingBottom: 'max(130px, calc(env(safe-area-inset-bottom, 0px) + 80px))',
           }}
           onClick={(e) => { if (e.target === backdropRef.current) setIsOpen(false) }}
         >
           <div
             id="eq-popup"
-            className="px-5 py-4"
             role="dialog"
             aria-modal="true"
             aria-label="Equalizer"
             style={{
-              background: 'var(--glass-bg)',
-              border: '0.5px solid var(--glass-border)',
+              background: 'var(--glass-bg)', border: '0.5px solid var(--glass-border)',
               borderRadius: 'var(--radius-squircle, 24px)',
               boxShadow: 'var(--shadow-floating)',
+              padding: '16px 20px',
               width: 'min(320px, 92vw)',
-              transform: 'translateY(0)',
-              opacity: 1,
+              transform: 'translateY(0)', opacity: 1,
               transition: 'transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.25s cubic-bezier(0.25, 0.1, 0.25, 1)',
             }}
           >
-            <div id="eq-popup-header" className="flex items-center justify-between mb-4">
-              <span id="eq-popup-title" className="text-[15px] font-semibold tracking-[0.08em] uppercase" style={{ color: 'var(--text-secondary)' }}>
+            <div id="eq-popup-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <span id="eq-popup-title" style={{ fontSize: 15, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>
                 Equalizer
               </span>
               <button
                 id="eq-close-btn"
-                className="w-11 h-11 rounded-full flex items-center justify-center border-none cursor-pointer text-lg transition-all"
-                style={{ background: 'var(--surface-secondary)', color: 'var(--text-secondary)' }}
+                style={{
+                  background: 'var(--surface-secondary)', border: 'none', cursor: 'pointer',
+                  width: 44, height: 44, borderRadius: '50%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: 'var(--text-secondary)', fontSize: 15, lineHeight: 1,
+                  transition: 'background 0.15s, color 0.15s',
+                }}
                 onClick={() => setIsOpen(false)}
                 aria-label="Close equalizer"
               >
@@ -126,38 +195,47 @@ export function EQPopup() {
             </div>
 
             {EQ_BANDS.map((band, i) => (
-              <div key={band.label} className="eq-band-row flex items-center gap-2 mb-3 last:mb-0">
-                <span className="eq-band-label text-[15px] font-medium w-12 flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>
+              <div key={band.label} className="eq-band-row" style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <span className="eq-band-label" style={{ fontSize: 15, color: 'var(--text-secondary)', fontWeight: 500, width: 48, flexShrink: 0 }}>
                   {band.label}
                 </span>
                 <input
+                  ref={el => { if (el) sliderElsRef.current[i] = el }}
                   type="range"
-                  className="eq-band-slider flex-1 h-1 rounded-full appearance-none cursor-pointer outline-none"
-                  min="-12"
-                  max="12"
-                  step="0.5"
+                  className="eq-band-slider"
+                  min={-12}
+                  max={12}
+                  step={0.5}
                   value={gains[i] ?? 0}
                   onChange={(e) => handleSliderChange(i, parseFloat(e.target.value))}
                   style={{
-                    background: 'var(--surface-secondary)',
+                    flex: 1, height: 4, borderRadius: 999, background: 'var(--surface-secondary)',
+                    outline: 'none', cursor: 'pointer', WebkitAppearance: 'none', appearance: 'none',
                   }}
                   aria-label={`${band.label} gain`}
                 />
-                <span className="eq-band-value text-[13px] w-12 text-right tabular-nums flex-shrink-0 font-mono" style={{ color: 'var(--text-tertiary)' }}>
+                <span className="eq-band-value" style={{
+                  fontSize: 13, color: 'var(--text-tertiary)', width: 48,
+                  textAlign: 'right', fontVariantNumeric: 'tabular-nums',
+                  flexShrink: 0, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                }}>
                   {formatGain(gains[i] ?? 0)}
                 </span>
               </div>
             ))}
 
-            <div id="eq-divider" className="h-[0.5px] my-4" style={{ background: 'var(--glass-border)' }} />
+            <div id="eq-divider" style={{ height: '0.5px', background: 'var(--glass-border)', margin: '16px 0 12px' }} />
 
             <button
               id="eq-reset-btn"
-              className="w-full py-2 rounded-lg text-[15px] font-sans cursor-pointer tracking-[0.02em] transition-all min-h-11 border"
               style={{
-                background: 'transparent',
-                borderColor: 'var(--glass-border)',
-                color: 'var(--text-secondary)',
+                width: '100%', padding: 8, background: 'transparent',
+                border: '0.5px solid var(--glass-border)',
+                borderRadius: 'var(--radius-md, 12px)',
+                color: 'var(--text-secondary)', fontSize: 15,
+                fontFamily: 'inherit', cursor: 'pointer',
+                letterSpacing: '0.02em', transition: 'background 0.15s, color 0.15s',
+                minHeight: 44,
               }}
               onClick={handleReset}
             >
