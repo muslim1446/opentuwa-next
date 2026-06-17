@@ -934,29 +934,43 @@ select:focus, select:hover {
 #transition-fade-layer.active { opacity: 1; pointer-events: all; }
 
 /* --- 10. RESPONSIVE DESIGN --- */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 820px) {
     #player-island {
         bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
         padding: 6px 10px;
         gap: 6px;
+        max-width: calc(100vw - 16px);
     }
+    .island-left { gap: 6px; min-width: 0; overflow: hidden; }
+    .island-right { gap: 4px; flex-shrink: 0; }
     .volume-popover { padding: 8px 12px; }
     .island-volume-slider { width: 80px; }
     #selects-row { gap: 8px; padding: 8px; }
     #selects-row .custom-select-wrapper .custom-select-trigger { font-size: 13px; padding: 8px; }
 
     #player-island .brand-text { display: none; }
+    #player-island .app-brand { flex-shrink: 0; padding: 0 4px; min-width: 0; }
     #player-island .brand-icon img { width: 20px; height: 20px; }
+    #player-island #translationSelectWrapper {
+        min-width: 0;
+        overflow: hidden;
+        flex: 1;
+    }
     #player-island #translationSelectWrapper .custom-select-trigger {
         font-size: 13px;
         padding: 6px 12px;
         min-height: 36px;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
-    .island-right { gap: 4px; }
-    .island-play-btn { width: 38px; height: 38px; }
-    .island-play-btn svg { width: 18px; height: 18px; }
+    .island-play-btn { width: 36px; height: 36px; flex-shrink: 0; }
+    .island-play-btn svg { width: 16px; height: 16px; }
+    .island-icon-btn { width: 36px; height: 36px; }
+    .island-icon-btn svg { width: 16px; height: 16px; }
     #player-island #eq-btn svg,
-    #player-island #audio-out-btn svg { width: 18px; height: 18px; }
+    #player-island #audio-out-btn svg { width: 16px; height: 16px; }
 
     #chapter-title {
         position: relative; top: 0; left: 0;
@@ -968,16 +982,20 @@ select:focus, select:hover {
 
 @media screen and (max-width: 380px) {
     #player-island {
-        padding: 4px 8px;
+        padding: 4px 6px;
         gap: 4px;
-        border-radius: 32px;
+        border-radius: 28px;
     }
-    #player-island .app-brand { padding: 0 2px; }
+    #player-island .app-brand { display: none; }
     #player-island #translationSelectWrapper .custom-select-trigger {
-        font-size: 12px;
+        font-size: 11px;
         padding: 4px 8px;
-        min-height: 32px;
+        min-height: 30px;
     }
+    .island-play-btn { width: 32px; height: 32px; }
+    .island-play-btn svg { width: 14px; height: 14px; }
+    .island-icon-btn { width: 32px; height: 32px; }
+    .island-icon-btn svg { width: 14px; height: 14px; }
     .island-right { gap: 2px; }
 }
 
