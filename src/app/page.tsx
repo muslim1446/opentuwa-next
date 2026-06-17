@@ -3,6 +3,8 @@ import { SURAH_METADATA } from '@/lib/surah-metadata'
 import { cookies } from 'next/headers'
 import HomeClient from './home-client'
 
+export const runtime = 'edge'
+
 const siteUrl = 'https://muslim.opentuwa.com'
 
 const description = 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations. Built for deep focus.'

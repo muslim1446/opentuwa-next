@@ -4,6 +4,8 @@ import { cookies } from 'next/headers'
 import { SURAH_METADATA } from '@/lib/surah-metadata'
 import { ChapterClient } from './chapter-client'
 
+export const runtime = 'edge'
+
 const siteUrl = 'https://muslim.opentuwa.com'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
