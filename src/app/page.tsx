@@ -22,8 +22,8 @@ export default function Home() {
 
   return (
     <>
-      <IslandSearch />
-      <SearchOverlay />
+      {view !== 'cinema' && <IslandSearch />}
+      {view !== 'cinema' && <SearchOverlay />}
       <div id="dashboard-view" className={view === 'dashboard' ? 'active' : ''}>
         <DashboardView />
       </div>
