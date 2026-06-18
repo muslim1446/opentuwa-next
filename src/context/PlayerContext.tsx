@@ -35,7 +35,6 @@ interface PlayerContextType {
   setAudioTrans: (id: string) => void
   togglePlayPause: () => void; nextVerse: () => void; prevVerse: () => void
   setVolume: (v: number) => void; toggleMute: () => void
-  currentTime: number; duration: number; seekTo: (time: number) => void
   launchPlayer: (chapterNum: number, verseNum?: number) => void
   loadQuranData: () => Promise<void>
   startPlayback: () => void
@@ -65,8 +64,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [shuffleChapters, setShuffleChapters] = useState(false)
   const [loopChapter, setLoopChapter] = useState(false)
   const shuffleOrderRef = useRef<number[]>([])
-  const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const transAudioRef = useRef<HTMLAudioElement | null>(null)
@@ -386,13 +383,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     if (audioRef.current) { audioRef.current.muted = !audioRef.current.muted; setIsMuted(audioRef.current.muted) }
   }, [])
 
-  const seekTo = useCallback((time: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = time
-      setCurrentTime(time)
-    }
-  }, [])
-
   const launchPlayer = useCallback((chapterNum: number, verseNum = 1) => {
     const fade = document.getElementById('transition-fade-layer')
     if (fade) fade.classList.add('active')
@@ -480,25 +470,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     return () => { audio.removeEventListener('play', onPlay); audio.removeEventListener('pause', onPause) }
   }, [])
 
-  // track audio currentTime and duration
-  useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-    const onTimeUpdate = () => {
-      if (!isSeekingRef.current) setCurrentTime(audio.currentTime)
-    }
-    const onLoadedMetadata = () => setDuration(audio.duration)
-    const onDurationChange = () => { if (audio.duration) setDuration(audio.duration) }
-    audio.addEventListener('timeupdate', onTimeUpdate)
-    audio.addEventListener('loadedmetadata', onLoadedMetadata)
-    audio.addEventListener('durationchange', onDurationChange)
-    return () => {
-      audio.removeEventListener('timeupdate', onTimeUpdate)
-      audio.removeEventListener('loadedmetadata', onLoadedMetadata)
-      audio.removeEventListener('durationchange', onDurationChange)
-    }
-  }, [])
-
   // idle timer
   useEffect(() => {
     const handler = () => {
@@ -566,8 +537,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       setChapter: setCurrentChapterIdx, setVerse: setCurrentVerseIdx,
       setReciter: setCurrentReciter, setTrans: setCurrentTrans, setAudioTrans: setCurrentAudioTrans,
       togglePlayPause, nextVerse, prevVerse,
-      setVolume, toggleMute, currentTime, duration, seekTo,
-      launchPlayer, loadQuranData, startPlayback,
+      setVolume, toggleMute, launchPlayer, loadQuranData, startPlayback,
     }}>
       {children}
     </PlayerContext.Provider>

@@ -705,36 +705,28 @@ body.idle #selects-row { opacity: 0; pointer-events: none; }
     transform: translateX(-50%) translateZ(0);
     z-index: 100;
     display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    width: min(680px, calc(100vw - 32px));
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 12px;
     background: rgba(30, 30, 30, 0.9);
     backdrop-filter: var(--glass-vibrancy);
     -webkit-backdrop-filter: var(--glass-vibrancy);
     border: 0.5px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
+    border-radius: 999px;
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3), 0 0 0 0.5px rgba(255, 255, 255, 0.05);
     transition: var(--transition-spring);
     user-select: none;
     -webkit-user-select: none;
-    padding: 8px 12px 6px;
-    gap: 0;
+    min-width: 340px;
 }
 
 body.idle #player-island { transform: translate(-50%, 150%) translateZ(0); opacity: 0; }
-
-.island-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-}
 
 .island-left {
     display: flex;
     align-items: center;
     gap: 2px;
-    flex-shrink: 0;
 }
 
 .island-center {
@@ -743,6 +735,7 @@ body.idle #player-island { transform: translate(-50%, 150%) translateZ(0); opaci
     gap: 10px;
     flex: 1;
     min-width: 0;
+    justify-content: center;
 }
 
 .island-artwork {
@@ -786,68 +779,6 @@ body.idle #player-island { transform: translate(-50%, 150%) translateZ(0); opaci
     text-overflow: ellipsis;
     letter-spacing: 0.01em;
     line-height: 1.2;
-}
-
-.island-time-elapsed,
-.island-time-remaining {
-    font-size: 11px;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.5);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-    flex-shrink: 0;
-    letter-spacing: 0.01em;
-}
-
-.island-right {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    flex-shrink: 0;
-}
-
-.island-progress {
-    width: 100%;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    padding: 6px 0 2px;
-    flex-shrink: 0;
-}
-
-.island-progress-track {
-    width: 100%;
-    height: 3px;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 999px;
-    position: relative;
-    overflow: visible;
-}
-
-.island-progress-fill {
-    height: 100%;
-    background: #FFFFFF;
-    border-radius: 999px;
-    transition: width 0.1s linear;
-}
-
-.island-progress-thumb {
-    position: absolute;
-    top: 50%;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #FFFFFF;
-    transform: translate(-50%, -50%);
-    opacity: 0;
-    transition: opacity 0.15s;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-}
-
-.island-progress:hover .island-progress-thumb,
-.island-progress:active .island-progress-thumb {
-    opacity: 1;
 }
 
 .island-right {
@@ -1076,18 +1007,17 @@ select:focus, select:hover {
 @media screen and (max-width: 820px) {
     #player-island {
         bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
-        width: calc(100vw - 16px);
-        padding: 6px 8px 4px;
+        padding: 5px 8px;
+        gap: 4px;
+        max-width: calc(100vw - 16px);
+        min-width: 0;
     }
-    .island-content { gap: 6px; }
     .island-left { gap: 0; }
     .island-right { gap: 0; }
     .island-center { gap: 8px; }
     .island-artwork { width: 36px; height: 36px; }
     .island-track-title { font-size: 12px; }
     .island-track-subtitle { font-size: 10px; }
-    .island-time-elapsed,
-    .island-time-remaining { font-size: 10px; }
     .volume-popover { padding: 8px 12px; }
     .island-volume-slider { width: 80px; }
     #selects-row { gap: 8px; padding: 8px; }
@@ -1117,14 +1047,14 @@ select:focus, select:hover {
 
 @media screen and (max-width: 380px) {
     #player-island {
-        padding: 4px 6px 3px;
-        border-radius: 12px;
+        padding: 4px 6px;
+        gap: 2px;
+        border-radius: 999px;
     }
     .island-center { gap: 6px; }
     .island-artwork { width: 32px; height: 32px; border-radius: 4px; }
     .island-track-title { font-size: 11px; }
     .island-track-subtitle { display: none; }
-    .island-time-remaining { display: none; }
     #player-island #translationSelectWrapper .custom-select-trigger {
         font-size: 10px;
         padding: 0 6px;
@@ -1313,7 +1243,6 @@ select:focus, select:hover {
 .island-transport-btn,
 .island-icon-btn,
 .island-center,
-.island-progress,
 #eq-btn,
 #audio-out-btn,
 .key {
