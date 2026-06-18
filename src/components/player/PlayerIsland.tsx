@@ -28,7 +28,7 @@ export function PlayerIsland() {
     <div id="player-island">
       <div className="island-left">
         <button
-          className={`island-transport-btn ${shuffleChapters ? 'transport-active' : ''}`}
+          className={`island-transport-btn shuffle-btn ${shuffleChapters ? 'transport-active' : ''}`}
           onClick={toggleShuffle}
           aria-label="Shuffle chapters"
           aria-pressed={shuffleChapters}
@@ -82,7 +82,7 @@ export function PlayerIsland() {
         </button>
 
         <button
-          className={`island-transport-btn ${loopChapter ? 'transport-active' : ''}`}
+          className={`island-transport-btn loop-btn ${loopChapter ? 'transport-active' : ''}`}
           onClick={toggleLoop}
           aria-label="Loop chapter"
           aria-pressed={loopChapter}
