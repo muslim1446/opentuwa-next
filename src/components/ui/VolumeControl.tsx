@@ -47,6 +47,7 @@ export function VolumeControl() {
       <button
         id="volume-btn"
         className="island-icon-btn"
+        style={{ color: 'rgba(255, 255, 255, 0.7)' }}
         onClick={() => setIsOpen(prev => !prev)}
         aria-label={isMuted ? 'Unmute' : 'Mute'}
         tabIndex={0}
