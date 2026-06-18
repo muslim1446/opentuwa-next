@@ -729,22 +729,57 @@ body.idle #player-island { transform: translate(-50%, 150%) translateZ(0); opaci
     gap: 2px;
 }
 
-.island-brand {
+.island-center {
     display: flex;
     align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
     justify-content: center;
+}
+
+.island-artwork {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    overflow: hidden;
     flex-shrink: 0;
-    text-decoration: none;
-    color: rgba(255, 255, 255, 0.5);
-    transition: color 0.2s;
+    background: rgba(255, 255, 255, 0.08);
 }
-.island-brand img {
-    width: 28px;
-    height: 28px;
-    opacity: 0.5;
-    transition: opacity 0.2s;
+.island-artwork img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
-.island-brand:hover img { opacity: 0.8; }
+
+.island-now-playing {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 1px;
+}
+
+.island-track-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #FFFFFF;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+}
+
+.island-track-subtitle {
+    font-size: 11px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.45);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+}
 
 .island-right {
     display: flex;
@@ -769,6 +804,7 @@ body.idle #player-island { transform: translate(-50%, 150%) translateZ(0); opaci
 }
 .island-transport-btn:hover { color: #FFFFFF; }
 .island-transport-btn:active { transform: scale(0.88); }
+.island-transport-btn.transport-active { color: var(--accent-blue); }
 
 .island-play-btn {
     width: 40px;
@@ -978,6 +1014,10 @@ select:focus, select:hover {
     }
     .island-left { gap: 0; }
     .island-right { gap: 0; }
+    .island-center { gap: 8px; }
+    .island-artwork { width: 36px; height: 36px; }
+    .island-track-title { font-size: 12px; }
+    .island-track-subtitle { font-size: 10px; }
     .volume-popover { padding: 8px 12px; }
     .island-volume-slider { width: 80px; }
     #selects-row { gap: 8px; padding: 8px; }
@@ -996,7 +1036,6 @@ select:focus, select:hover {
         padding: 0 8px;
         min-height: 28px;
     }
-    .island-brand img { width: 24px; height: 24px; }
 
     #chapter-title {
         position: relative; top: 0; left: 0;
@@ -1012,7 +1051,10 @@ select:focus, select:hover {
         gap: 2px;
         border-radius: 999px;
     }
-    .island-brand { display: none; }
+    .island-center { gap: 6px; }
+    .island-artwork { width: 32px; height: 32px; border-radius: 4px; }
+    .island-track-title { font-size: 11px; }
+    .island-track-subtitle { display: none; }
     #player-island #translationSelectWrapper .custom-select-trigger {
         font-size: 10px;
         padding: 0 6px;
@@ -1200,7 +1242,7 @@ select:focus, select:hover {
 .island-play-btn,
 .island-transport-btn,
 .island-icon-btn,
-.island-brand,
+.island-center,
 #eq-btn,
 #audio-out-btn,
 .key {

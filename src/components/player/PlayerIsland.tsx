@@ -8,16 +8,39 @@ import { TRANSLATIONS_CONFIG } from '@/lib/configs'
 import { EQPopup } from './EQPopup'
 
 export function PlayerIsland() {
-  const { currentTrans, isPlaying, setTrans, togglePlayPause, nextVerse, prevVerse } = usePlayer()
+  const {
+    currentTrans, isPlaying, setTrans, togglePlayPause,
+    nextVerse, prevVerse, shuffleChapters, loopChapter,
+    toggleShuffle, toggleLoop,
+    chapterTitle, currentChapterIdx, currentVerseIdx, quranData,
+  } = usePlayer()
   const { translate } = useI18n()
 
   const transItems = Object.entries(TRANSLATIONS_CONFIG).map(([k, v]) => ({
     value: k, text: v.name,
   }))
 
+  const chapter = quranData[currentChapterIdx]
+  const chNum = chapter?.chapterNumber || 0
+  const verseNum = chapter?.verses[currentVerseIdx]?.verseNumber || 0
+
   return (
     <div id="player-island">
       <div className="island-left">
+        <button
+          className={`island-transport-btn ${shuffleChapters ? 'transport-active' : ''}`}
+          onClick={toggleShuffle}
+          aria-label="Shuffle chapters"
+          aria-pressed={shuffleChapters}
+          tabIndex={0}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="16 3 21 3 21 8" /><line x1="4" y1="20" x2="21" y2="3" />
+            <polyline points="21 16 21 21 16 21" /><line x1="15" y1="15" x2="21" y2="21" />
+            <line x1="4" y1="4" x2="9" y2="9" />
+          </svg>
+        </button>
+
         <button
           className="island-transport-btn"
           onClick={prevVerse}
@@ -57,11 +80,37 @@ export function PlayerIsland() {
             <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
           </svg>
         </button>
+
+        <button
+          className={`island-transport-btn ${loopChapter ? 'transport-active' : ''}`}
+          onClick={toggleLoop}
+          aria-label="Loop chapter"
+          aria-pressed={loopChapter}
+          tabIndex={0}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 0 1 4-4h14" />
+            <polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 0 1-4 4H3" />
+          </svg>
+        </button>
       </div>
 
-      <a href="/" className="island-brand" aria-label="Tuwa Home">
-        <img src="https://opentuwa.com/assets/ui/favicon.svg" alt="Tuwa" width="28" height="28" />
-      </a>
+      <div className="island-center">
+        <div className="island-artwork">
+          <img
+            src="https://opentuwa.com/assets/ui/favicon.svg"
+            alt=""
+            width="40"
+            height="40"
+          />
+        </div>
+        <div className="island-now-playing">
+          <div className="island-track-title">{chapterTitle || 'Tuwa'}</div>
+          <div className="island-track-subtitle">
+            {chNum ? `Surah ${chNum}:${verseNum}` : 'Quran Audio'}
+          </div>
+        </div>
+      </div>
 
       <div className="island-right">
         <CustomSelect

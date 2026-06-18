@@ -28,6 +28,8 @@ interface PlayerContextType {
   volume: number; isMuted: boolean; isIdle: boolean
   forbiddenVerses: Set<string>; timingData: TimingData | null
   focusedSurah: FocusedSurah | null; setFocusedSurah: (f: FocusedSurah | null) => void
+  shuffleChapters: boolean; loopChapter: boolean
+  toggleShuffle: () => void; toggleLoop: () => void
   setChapter: (idx: number) => void; setVerse: (idx: number) => void
   setReciter: (id: string) => void; setTrans: (id: string) => void
   setAudioTrans: (id: string) => void
@@ -59,6 +61,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [forbiddenVerses, setForbiddenVerses] = useState<Set<string>>(new Set())
   const [timingData, setTimingData] = useState<TimingData | null>(null)
   const [focusedSurah, setFocusedSurah] = useState<FocusedSurah | null>(null)
+  const [shuffleChapters, setShuffleChapters] = useState(false)
+  const [loopChapter, setLoopChapter] = useState(false)
+  const shuffleOrderRef = useRef<number[]>([])
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const transAudioRef = useRef<HTMLAudioElement | null>(null)
@@ -314,14 +319,48 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     else { audio.pause(); setIsPlaying(false) }
   }, [])
 
+  const generateShuffleOrder = useCallback((total: number) => {
+    const order = Array.from({ length: total }, (_, i) => i)
+    for (let i = order.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[order[i], order[j]] = [order[j], order[i]]
+    }
+    return order
+  }, [])
+
+  const toggleShuffle = useCallback(() => {
+    setShuffleChapters(prev => {
+      const next = !prev
+      if (next) {
+        shuffleOrderRef.current = generateShuffleOrder(quranData.length)
+      }
+      return next
+    })
+  }, [quranData.length, generateShuffleOrder])
+
+  const toggleLoop = useCallback(() => {
+    setLoopChapter(prev => !prev)
+  }, [])
+
   const goToNextChapter = useCallback(() => {
-    if (currentChapterIdx + 1 < quranData.length) {
-      setCurrentChapterIdx(currentChapterIdx + 1)
+    if (shuffleChapters && shuffleOrderRef.current.length > 0) {
+      const currentPos = shuffleOrderRef.current.indexOf(currentChapterIdx)
+      const nextPos = currentPos + 1
+      if (nextPos < shuffleOrderRef.current.length) {
+        setCurrentChapterIdx(shuffleOrderRef.current[nextPos])
+      } else {
+        shuffleOrderRef.current = generateShuffleOrder(quranData.length)
+        setCurrentChapterIdx(shuffleOrderRef.current[0])
+      }
     } else {
-      setCurrentChapterIdx(0)
+      if (currentChapterIdx + 1 < quranData.length) {
+        setCurrentChapterIdx(currentChapterIdx + 1)
+      } else {
+        setCurrentChapterIdx(0)
+      }
     }
     setCurrentVerseIdx(0)
-  }, [quranData, currentChapterIdx])
+  }, [quranData, currentChapterIdx, shuffleChapters, generateShuffleOrder])
 
   const nextVerse = useCallback(() => {
     const ch = quranData[currentChapterIdx]
@@ -405,14 +444,20 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     return () => audio.removeEventListener('timeupdate', onTimeUpdate)
   }, [currentChapterIdx, currentTrans, quranData, forbiddenVerses, doSaveState, updateMediaSession])
 
-  // audio ended -> next chapter (or loop 114 -> 1)
+  // audio ended -> next chapter (or loop chapter, or loop 114 -> 1)
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
-    const ended = () => goToNextChapter()
+    const ended = () => {
+      if (loopChapter) {
+        setCurrentVerseIdx(0)
+      } else {
+        goToNextChapter()
+      }
+    }
     audio.addEventListener('ended', ended)
     return () => audio.removeEventListener('ended', ended)
-  }, [goToNextChapter])
+  }, [goToNextChapter, loopChapter])
 
   // sync play/pause state
   useEffect(() => {
@@ -487,6 +532,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       isPlaying, isBuffering, volume, isMuted, isIdle,
       forbiddenVerses, timingData,
       focusedSurah, setFocusedSurah,
+      shuffleChapters, loopChapter,
+      toggleShuffle, toggleLoop,
       setChapter: setCurrentChapterIdx, setVerse: setCurrentVerseIdx,
       setReciter: setCurrentReciter, setTrans: setCurrentTrans, setAudioTrans: setCurrentAudioTrans,
       togglePlayPause, nextVerse, prevVerse,
