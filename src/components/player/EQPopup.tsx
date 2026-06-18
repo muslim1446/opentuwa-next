@@ -149,7 +149,7 @@ export function EQPopup() {
           id="eq-backdrop"
           style={{
             display: 'flex', position: 'fixed', inset: 0, zIndex: 9998,
-            background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(4px)',
+            background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)',
             WebkitBackdropFilter: 'blur(4px)',
             alignItems: 'flex-end', justifyContent: 'center',
             paddingBottom: 'max(130px, calc(env(safe-area-inset-bottom, 0px) + 80px))',
@@ -162,7 +162,7 @@ export function EQPopup() {
             aria-modal="true"
             aria-label="Equalizer"
             style={{
-              background: 'var(--glass-bg)', border: '0.5px solid var(--glass-border)',
+              background: 'rgba(36, 36, 38, 0.98)', border: '0.5px solid var(--glass-border)',
               borderRadius: 'var(--radius-squircle, 24px)',
               boxShadow: 'var(--shadow-floating)',
               padding: '16px 20px',
