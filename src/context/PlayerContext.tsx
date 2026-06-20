@@ -7,7 +7,7 @@ import { ChapterData, ViewType, TimingData } from '@/lib/types'
 import { SURAH_METADATA } from '@/lib/surah-metadata'
 import {
   RECITERS_CONFIG, TRANSLATIONS_CONFIG, STORAGE_KEY,
-  RTL_CODES, FTT_URL, ARTIST_NAME, HOMEPAGE_TITLE, CHAPTER_TITLE_SUFFIX,
+  RTL_CODES, FTT_URL, ARTIST_NAME, ALBUM_NAME, HOMEPAGE_TITLE, CHAPTER_TITLE_SUFFIX,
 } from '@/lib/configs'
 import { encodeStream, decodeStream, loadState, saveState, getBrowserLang } from '@/lib/stream-utils'
 import { getChapterTiming } from '@/lib/timing'

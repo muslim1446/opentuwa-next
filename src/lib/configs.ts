@@ -1,6 +1,7 @@
 import { TranslationConfig, ReciterConfig, TranslationAudioConfig } from './types'
 
 export const ARTIST_NAME = 'Mishari Rashid Alafasy'
+export const ALBUM_NAME = 'The Quran'
 export const HOMEPAGE_TITLE = 'Tuwa - Web Player'
 export const CHAPTER_TITLE_SUFFIX = ' - Tuwa Audio'
 
