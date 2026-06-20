@@ -7,7 +7,7 @@ import { ChapterData, ViewType, TimingData } from '@/lib/types'
 import { SURAH_METADATA } from '@/lib/surah-metadata'
 import {
   RECITERS_CONFIG, TRANSLATIONS_CONFIG, STORAGE_KEY,
-  RTL_CODES, FTT_URL,
+  RTL_CODES, FTT_URL, ARTIST_NAME, HOMEPAGE_TITLE, CHAPTER_TITLE_SUFFIX,
 } from '@/lib/configs'
 import { encodeStream, decodeStream, loadState, saveState, getBrowserLang } from '@/lib/stream-utils'
 import { getChapterTiming } from '@/lib/timing'
@@ -516,6 +516,15 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       }
     }
   }, [currentTrans, quranDataLoaded, view])
+
+  // Update document title on chapter change
+  useEffect(() => {
+    if (chapterTitle) {
+      document.title = `${chapterTitle} - Recitation by ${ARTIST_NAME}${CHAPTER_TITLE_SUFFIX}`
+    } else {
+      document.title = HOMEPAGE_TITLE
+    }
+  }, [chapterTitle])
 
   // vh on resize
   useEffect(() => {

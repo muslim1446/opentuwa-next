@@ -4,13 +4,13 @@ import { Providers } from './providers'
 import { ClientInit } from './client-init'
 
 export const metadata: Metadata = {
-  title: 'Tuwa - Premium Quran Audio Player',
+  title: 'Tuwa - Web Player',
   description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
   authors: [{ name: 'Tuwa Media' }],
   manifest: '/manifest.json',
   openGraph: {
     siteName: 'Tuwa',
-    title: 'Tuwa - Premium Quran Audio Player',
+    title: 'Tuwa - Web Player',
     description: 'Distraction-free Quran streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
     type: 'website',
     locale: 'en_US',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Tuwa - Premium Quran Audio Player',
+    title: 'Tuwa - Web Player',
     description: 'Distraction-free Quran streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
     site: '@opentuwa',
   },

@@ -1,5 +1,9 @@
 import { TranslationConfig, ReciterConfig, TranslationAudioConfig } from './types'
 
+export const ARTIST_NAME = 'Mishari Rashid Alafasy'
+export const HOMEPAGE_TITLE = 'Tuwa - Web Player'
+export const CHAPTER_TITLE_SUFFIX = ' - Tuwa Audio'
+
 export const TRANSLATIONS_CONFIG: Record<string, TranslationConfig> = {
   'en': { name: 'English', url: 'https://raw.githubusercontent.com/Quran-lite-pages-dev/Quran-lite.pages.dev/refs/heads/master/assets/data/translations/en.xml' },
   'sq': { name: 'Albanian', url: 'https://raw.githubusercontent.com/Quran-lite-pages-dev/Quran-lite.pages.dev/refs/heads/master/assets/data/translations/sq.ahmeti.xml' },
