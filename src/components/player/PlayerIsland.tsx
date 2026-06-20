@@ -107,7 +107,7 @@ export function PlayerIsland() {
         <div className="island-now-playing">
           <div className="island-track-title">{chapterTitle || 'Tuwa'}</div>
           <div className="island-track-subtitle">
-            {chNum ? `Surah ${chNum}:${verseNum}` : 'Quran Audio'}
+            {chNum ? `The Quran \u2022 Verse ${verseNum}` : 'Quran Audio'}
           </div>
         </div>
       </div>
