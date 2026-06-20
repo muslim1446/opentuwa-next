@@ -3,24 +3,55 @@ import './globals.css'
 import { Providers } from './providers'
 import { ClientInit } from './client-init'
 
+const siteUrl = 'https://muslim.opentuwa.com'
+
 export const metadata: Metadata = {
-  title: 'Tuwa - Web Player',
-  description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
+  title: {
+    default: 'Tuwa - Web Player',
+    template: '%s | Tuwa',
+  },
+  description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations. Built for deep focus.',
   authors: [{ name: 'Tuwa Media' }],
+  creator: 'Tuwa Media',
+  publisher: 'Tuwa Media',
+  metadataBase: new URL(siteUrl),
+  alternates: {
+    canonical: '/',
+  },
   manifest: '/manifest.json',
   openGraph: {
-    siteName: 'Tuwa',
-    title: 'Tuwa - Web Player',
-    description: 'Distraction-free Quran streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
     type: 'website',
+    siteName: 'Tuwa',
     locale: 'en_US',
-    images: ['https://opentuwa.com/assets/ui/web_1200.png'],
+    url: siteUrl,
+    title: 'Tuwa - Web Player',
+    description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
+    images: [
+      {
+        url: 'https://opentuwa.com/assets/ui/web_1200.png',
+        width: 1200,
+        height: 630,
+        alt: 'Tuwa - Quran Audio Player',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Tuwa - Web Player',
-    description: 'Distraction-free Quran streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
+    description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
     site: '@opentuwa',
+    images: ['https://opentuwa.com/assets/ui/web_1200.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
   other: {
     'apple-mobile-web-app-capable': 'yes',
@@ -41,6 +72,63 @@ export const viewport: Viewport = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const websiteJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Tuwa',
+    alternateName: 'Tuwa Quran Audio Player',
+    url: siteUrl,
+    description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
+    publisher: {
+      '@type': 'Organization',
+      name: 'Tuwa Media',
+      url: siteUrl,
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://opentuwa.com/assets/ui/favicon-96x96.png',
+        width: 96,
+        height: 96,
+      },
+    },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${siteUrl}/?search={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+    inLanguage: 'en-US',
+  }
+
+  const softwareJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Tuwa',
+    alternateName: 'Tuwa Quran Audio Player',
+    applicationCategory: 'MusicApplication',
+    operatingSystem: 'Web, iOS, tvOS, Android',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+    },
+    author: {
+      '@type': 'Organization',
+      name: 'Tuwa Media',
+      url: siteUrl,
+    },
+    description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.8',
+      ratingCount: '32000000',
+      bestRating: '5',
+      worstRating: '1',
+    },
+  }
+
   return (
     <html lang="en" dir="auto" suppressHydrationWarning>
       <head>
@@ -58,34 +146,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://raw.githubusercontent.com" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@graph': [
-                {
-                  '@type': 'WebSite',
-                  name: 'Tuwa',
-                  alternateName: 'Tuwa Quran Audio Player',
-                  url: 'https://muslim.opentuwa.com/',
-                  description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
-                  publisher: { '@type': 'Organization', name: 'Tuwa Media', url: 'https://muslim.opentuwa.com/', logo: { '@type': 'ImageObject', url: 'https://opentuwa.com/assets/ui/favicon-96x96.png' } },
-                  potentialAction: { '@type': 'SearchAction', target: { '@type': 'EntryPoint', urlTemplate: 'https://muslim.opentuwa.com/?search={search_term_string}' }, 'query-input': 'required name=search_term_string' },
-                  inLanguage: 'en-US',
-                },
-                {
-                  '@type': 'SoftwareApplication',
-                  name: 'Tuwa',
-                  alternateName: 'Tuwa Quran Audio Player',
-                  applicationCategory: 'MusicApplication',
-                  operatingSystem: 'Web, iOS, tvOS, Android',
-                  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', availability: 'https://schema.org/InStock' },
-                  author: { '@type': 'Organization', name: 'Tuwa Media', url: 'https://muslim.opentuwa.com/' },
-                  description: 'Distraction-free Quran streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
-                  aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.8', ratingCount: '32000000', bestRating: '5', worstRating: '1' },
-                },
-              ],
-            }),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }}
         />
       </head>
       <body className="home">
