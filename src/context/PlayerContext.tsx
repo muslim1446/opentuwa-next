@@ -23,7 +23,7 @@ interface PlayerContextType {
   quranData: ChapterData[]; quranDataLoaded: boolean
   currentChapterIdx: number; currentVerseIdx: number
   currentReciter: string; currentTrans: string; currentAudioTrans: string
-  translationText: string; chapterTitle: string
+  translationText: string; chapterTitle: string; displayVerseNumber: number
   isPlaying: boolean; isBuffering: boolean
   volume: number; isMuted: boolean; isIdle: boolean
   forbiddenVerses: Set<string>; timingData: TimingData | null
@@ -53,6 +53,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [currentAudioTrans, setCurrentAudioTrans] = useState('none')
   const [translationText, setTranslationText] = useState('')
   const [chapterTitle, setChapterTitle] = useState('')
+  const [displayVerseNumber, setDisplayVerseNumber] = useState(1)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isBuffering, setIsBuffering] = useState(false)
   const [volume, setVolumeState] = useState(0.8)
@@ -278,6 +279,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     timingCache.current[chNum] = timing
 
     setChapterTitle(ch.english_name)
+    setDisplayVerseNumber(vNum)
     const splashTitle = document.getElementById('doors-hero-title')
     if (splashTitle) splashTitle.textContent = ch.english_name
     const titleEl = document.getElementById('chapter-title')
@@ -419,6 +421,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       if (!match) return
       if (match.verse === displayVerseRef.current) return
       displayVerseRef.current = match.verse
+      setDisplayVerseNumber(match.verse)
       const te = document.getElementById('chapter-title')
       if (te) te.innerHTML = `${ch.title} <span class="chapter-subtitle">(${chNum}:${match.verse})</span>`
       const key = `${chNum}-${match.verse}`
@@ -528,7 +531,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       quranData, quranDataLoaded,
       currentChapterIdx, currentVerseIdx,
       currentReciter, currentTrans, currentAudioTrans,
-      translationText, chapterTitle,
+      translationText, chapterTitle, displayVerseNumber,
       isPlaying, isBuffering, volume, isMuted, isIdle,
       forbiddenVerses, timingData,
       focusedSurah, setFocusedSurah,

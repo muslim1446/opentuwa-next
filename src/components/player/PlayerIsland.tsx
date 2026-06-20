@@ -12,7 +12,7 @@ export function PlayerIsland() {
     currentTrans, isPlaying, setTrans, togglePlayPause,
     nextVerse, prevVerse, shuffleChapters, loopChapter,
     toggleShuffle, toggleLoop,
-    chapterTitle, currentChapterIdx, currentVerseIdx, quranData,
+    chapterTitle, currentChapterIdx, displayVerseNumber, quranData,
   } = usePlayer()
   const { translate } = useI18n()
 
@@ -22,7 +22,6 @@ export function PlayerIsland() {
 
   const chapter = quranData[currentChapterIdx]
   const chNum = chapter?.chapterNumber || 0
-  const verseNum = chapter?.verses[currentVerseIdx]?.verseNumber || 0
 
   return (
     <div id="player-island">
@@ -107,7 +106,7 @@ export function PlayerIsland() {
         <div className="island-now-playing">
           <div className="island-track-title">{chapterTitle || 'Tuwa'}</div>
           <div className="island-track-subtitle">
-            {chNum ? `The Quran \u2022 Verse ${verseNum}` : 'Quran Audio'}
+            {chNum ? `The Quran \u2022 Verse ${displayVerseNumber}` : 'Quran Audio'}
           </div>
         </div>
       </div>
