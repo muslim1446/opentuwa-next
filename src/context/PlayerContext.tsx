@@ -517,14 +517,14 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }
   }, [currentTrans, quranDataLoaded, view])
 
-  // Update document title on chapter change
+  // Update document title — stable, only changes on view switch
   useEffect(() => {
-    if (chapterTitle) {
+    if (view === 'cinema' && chapterTitle) {
       document.title = `${chapterTitle} - Recitation by ${ARTIST_NAME}${CHAPTER_TITLE_SUFFIX}`
-    } else {
+    } else if (view === 'dashboard') {
       document.title = HOMEPAGE_TITLE
     }
-  }, [chapterTitle])
+  }, [view, chapterTitle])
 
   // vh on resize
   useEffect(() => {
