@@ -203,15 +203,6 @@
 .btn-large   { height: var(--control-large);  font-size: var(--type-body);     padding: 10px 20px; border-radius: var(--radius-pill); }
 .btn-xlarge  { height: var(--control-xl);     font-size: var(--type-title-3);  padding: 14px 28px; border-radius: var(--radius-pill); }
 
-/* macOS: rounded rectangles for small sizes */
-@media (min-width: 1024px) {
-  [data-platform="macos"] .btn-mini,
-  [data-platform="macos"] .btn-small,
-  [data-platform="macos"] .btn-regular {
-    border-radius: var(--radius-sm);
-  }
-}
-
 /* --------------------------------------------------------------------------
    4. NAVIGATION BARS, TAB BARS, SEARCH
    -------------------------------------------------------------------------- */

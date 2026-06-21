@@ -269,21 +269,45 @@
 /* ---- @supports: CORNER-SHAPE ENHANCED RADII ---- */
 @supports (corner-shape: superellipse(2)) {
   :root {
+    /* Only top-level role-based radii get enhanced — continuous curvature
+       can carry a larger radius before appearing "too round".
+       Small control radii (--radius-xs, --radius-sm) stay at their base
+       values — at small radius-to-size ratios the visual difference between
+       circular and continuous is imperceptible (§1.3 DISCRETION). */
     --radius-card: var(--radius-card-continuous, 20px);
-    --radius-sm:   var(--radius-sm-continuous, 16px);
-    --radius-xs:   var(--radius-xs-continuous, 12px);
   }
 }
 
 /* ---- PLATFORM-SPECIFIC ADAPTATIONS ---- */
-/* iOS: capsules dominate */
-[data-platform="ios"] [data-shape="auto"]:not([data-shape="fixed"]) {
+/* iOS: Mini/Small = rounded rects (6–8pt), Regular+ = capsules */
+[data-platform="ios"] .btn-mini,
+[data-platform="ios"] .btn-small {
+  border-radius: var(--radius-xs);
+}
+[data-platform="ios"] .btn-regular,
+[data-platform="ios"] .btn-large,
+[data-platform="ios"] .btn-xlarge {
+  border-radius: var(--radius-pill);
+}
+/* iOS: any other auto-shaped element → capsule (touch-friendly default) */
+[data-platform="ios"] [data-shape="auto"]:not([data-shape="fixed"]):not([class*="btn-"]) {
   border-radius: var(--radius-pill);
 }
 
-/* macOS: rounded rectangles for small sizes */
-[data-platform="macos"] [data-shape="auto"]:not([data-shape="capsule"]) {
-  border-radius: var(--radius-sm);
+/* macOS: Mini/Small/Regular = sharper fixed radii (squared, dense desktop) */
+[data-platform="macos"] .btn-mini,
+[data-platform="macos"] .btn-small,
+[data-platform="macos"] .btn-regular {
+  border-radius: var(--radius-xs);
+}
+/* macOS: Large+ = capsules (only at large, prominent sizes) */
+[data-platform="macos"] .btn-large,
+[data-platform="macos"] .btn-xlarge {
+  border-radius: var(--radius-pill);
+}
+/* macOS: other auto-shaped elements → rounded rect (desktop-appropriate) */
+[data-platform="macos"] [data-shape="auto"]:not([data-shape="capsule"]):not([class*="btn-"]) {
+  border-radius: var(--radius-xs);
 }
 
 /* ---- CORNER-SHAPE NATIVE SUPPORT ---- */
