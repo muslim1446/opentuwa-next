@@ -102,6 +102,7 @@ export default async function AlbumPage({
 
   return (
     <>
+      <style>{`.album-track-link:hover { background: rgba(255,255,255,0.05); }`}</style>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -149,10 +150,8 @@ export default async function AlbumPage({
                   textDecoration: 'none',
                   color: 'rgba(255,255,255,0.8)',
                   fontSize: 14,
-                  transition: 'background 0.15s',
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                className="album-track-link"
               >
                 <span style={{ width: 24, textAlign: 'right', color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>{track.track_number}</span>
                 <span style={{ flexGrow: 1 }}>{track.title}</span>
