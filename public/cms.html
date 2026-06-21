@@ -220,6 +220,7 @@ button.btn-icon { padding: 0.28rem 0.38rem; }
             </div>
             <div class="form-group"><label>Title *</label><input id="ab-title" placeholder="Album title" oninput="autoSlug('ab-title','ab-slug')" /></div>
             <div class="form-group"><label>Slug</label><input id="ab-slug" placeholder="url-slug" /></div>
+            <div class="form-group"><label>Album ID (auto-generated, read-only)</label><input id="ab-id" readonly style="opacity:0.6;cursor:not-allowed;" placeholder="auto-generated on save" /></div>
             <div class="form-group"><label>Description</label><textarea id="ab-desc" placeholder="Album description"></textarea></div>
             <div class="row">
               <div class="form-group"><label>Artwork URL</label><input id="ab-artwork" placeholder="https://…" /></div>
@@ -241,9 +242,13 @@ button.btn-icon { padding: 0.28rem 0.38rem; }
               <div class="form-group"><label>Timing Base URL</label><input id="ab-timing-url" placeholder="https://…/{chapter}.json" /></div>
               <div class="form-group"><label>Audio Base URL</label><input id="ab-audio-url" placeholder="https://…/{track}.wav" /></div>
             </div>
-            <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:0.5rem;">
-              <button class="btn-outline" onclick="clearAlbumForm()">Clear</button>
-              <button class="btn-primary" onclick="saveAlbum()">Save Album</button>
+            <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:0.5rem;flex-wrap:wrap;">
+              <span style="flex-grow:1;display:flex;gap:0.4rem;">
+                <button class="btn-outline" onclick="clearAlbumForm()">Clear</button>
+                <button class="btn-primary" onclick="saveAlbum()">Save Album</button>
+              </span>
+              <a id="ab-view-link" href="#" target="_blank" style="display:none;font-size:0.76rem;color:var(--success);text-decoration:none;padding:0.32rem 0.65rem;border:1px solid rgba(16,185,129,0.3);border-radius:4px;">View Album ↗</a>
+              <button id="ab-delete-btn" class="btn-danger" onclick="confirmDeleteAlbum()" style="display:none;">Delete</button>
             </div>
           </div>
         </div>
@@ -272,6 +277,7 @@ button.btn-icon { padding: 0.28rem 0.38rem; }
               <select id="tr-album"><option value="">Select album…</option></select>
             </div>
             <div class="form-group"><label>Title *</label><input id="tr-title" placeholder="Track title" /></div>
+            <div class="form-group"><label>Track ID (auto-generated, read-only)</label><input id="tr-id" readonly style="opacity:0.6;cursor:not-allowed;" placeholder="auto-generated on save" /></div>
             <div class="row">
               <div class="form-group"><label>Track #</label><input id="tr-number" type="number" min="1" value="1" /></div>
               <div class="form-group"><label>Disc #</label><input id="tr-disc" type="number" min="1" value="1" /></div>
@@ -283,9 +289,13 @@ button.btn-icon { padding: 0.28rem 0.38rem; }
             <div class="form-group"><label>Audio URL</label><input id="tr-audio" placeholder="https://…" /></div>
             <div class="form-group"><label>Preview URL</label><input id="tr-preview" placeholder="https://… (short preview)" /></div>
             <div class="form-group"><label>Timing JSON URL</label><input id="tr-timing" placeholder="https://… (verse timing)" /></div>
-            <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:0.5rem;">
-              <button class="btn-outline" onclick="clearTrackForm()">Clear</button>
-              <button class="btn-primary" onclick="saveTrack()">Save Track</button>
+            <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:0.5rem;flex-wrap:wrap;">
+              <span style="flex-grow:1;display:flex;gap:0.4rem;">
+                <button class="btn-outline" onclick="clearTrackForm()">Clear</button>
+                <button class="btn-primary" onclick="saveTrack()">Save Track</button>
+              </span>
+              <a id="tr-view-link" href="#" target="_blank" style="display:none;font-size:0.76rem;color:var(--success);text-decoration:none;padding:0.32rem 0.65rem;border:1px solid rgba(16,185,129,0.3);border-radius:4px;">View Track ↗</a>
+              <button id="tr-delete-btn" class="btn-danger" onclick="confirmDeleteTrack()" style="display:none;">Delete</button>
             </div>
           </div>
         </div>
@@ -343,6 +353,59 @@ function val(id) { return document.getElementById(id)?.value?.trim() || ''; }
 function autoSlug(fromId, toId) {
   const v = val(fromId);
   document.getElementById(toId).value = v.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+}
+function slugify(s) { return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
+
+/* ─── DELETE ─── */
+function confirmDeleteArtist(id) {
+  const a = artists.find(x => x.id === id);
+  document.getElementById('del-msg').textContent = `Delete artist "${a?.name||id}" and ALL their albums and tracks? This cannot be undone.`;
+  pendingDelete = { type: 'artist', id };
+  openModal('delete-modal');
+}
+
+function confirmDeleteAlbum(id) {
+  const a = albums.find(x => x.id === id);
+  document.getElementById('del-msg').textContent = `Delete album "${a?.title||id}" and ALL its tracks? This cannot be undone.`;
+  pendingDelete = { type: 'album', id };
+  openModal('delete-modal');
+}
+
+function confirmDeleteTrack(id) {
+  const t = tracks.find(x => x.id === id);
+  document.getElementById('del-msg').textContent = `Delete track "${t?.title||id}"? This cannot be undone.`;
+  pendingDelete = { type: 'track', id };
+  openModal('delete-modal');
+}
+
+async function executeDelete() {
+  if (!pendingDelete) return;
+  const btn = document.getElementById('btn-confirm-del');
+  btn.disabled = true; btn.textContent = '⏳ Deleting…';
+  try {
+    if (pendingDelete.type === 'artist') {
+      await d1Query('DELETE FROM tracks WHERE artist_id = ?', [pendingDelete.id]);
+      await d1Query('DELETE FROM albums WHERE artist_id = ?', [pendingDelete.id]);
+      await d1Query('DELETE FROM artists WHERE id = ?', [pendingDelete.id]);
+      toast('Artist and all content deleted','success');
+      clearArtistForm();
+      await loadData();
+    } else if (pendingDelete.type === 'album') {
+      await d1Query('DELETE FROM tracks WHERE album_id = ?', [pendingDelete.id]);
+      await d1Query('DELETE FROM albums WHERE id = ?', [pendingDelete.id]);
+      toast('Album and all tracks deleted','success');
+      clearAlbumForm();
+      await loadData();
+    } else if (pendingDelete.type === 'track') {
+      await d1Query('DELETE FROM tracks WHERE id = ?', [pendingDelete.id]);
+      toast('Track deleted','success');
+      clearTrackForm();
+      await loadTracks();
+    }
+  } catch(e) { toast('Delete error: ' + e.message, 'error'); }
+  closeModal('delete-modal');
+  btn.disabled = false; btn.textContent = 'Permanently Delete';
+  pendingDelete = null;
 }
 
 /* ─── TABS ─── */
@@ -416,8 +479,13 @@ function filterArtists() {
   if (!filtered.length) { list.innerHTML = '<div class="list-empty">No artists found.</div>'; return; }
   list.innerHTML = filtered.map(a => `
     <div class="entity-card${a.id === editingArtistId ? ' active' : ''}" onclick="showArtistForm('${esc(a.id)}')">
-      <div class="card-title">${esc(a.name)}</div>
-      <div class="card-slug">${esc(a.id)} · ${esc(a.genre||'—')}</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div class="card-title">${esc(a.name)}</div>
+          <div class="card-slug">${esc(a.id)} · ${esc(a.genre||'—')}</div>
+        </div>
+        <button class="btn-danger btn-icon" onclick="event.stopPropagation();confirmDeleteArtist('${esc(a.id)}')" title="Delete artist">✕</button>
+      </div>
     </div>
   `).join('');
 }
@@ -483,8 +551,13 @@ function filterAlbums() {
   list.innerHTML = filtered.map(a => {
     const artist = artists.find(x => x.id === a.artist_id);
     return `<div class="entity-card${a.id === editingAlbumId ? ' active' : ''}" onclick="showAlbumForm('${esc(a.id)}')">
-      <div class="card-title">${esc(a.title)}</div>
-      <div class="card-meta"><span class="card-slug">${esc(artist?.name||'—')}</span><span class="card-tag">${a.track_count||0} tracks</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div class="card-title">${esc(a.title)}</div>
+          <div class="card-meta"><span class="card-slug">${esc(artist?.name||'—')}</span><span class="card-tag">${a.track_count||0} tracks</span></div>
+        </div>
+        <button class="btn-danger btn-icon" onclick="event.stopPropagation();confirmDeleteAlbum('${esc(a.id)}')" title="Delete album">✕</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -505,6 +578,7 @@ function showAlbumForm(id) {
   editingAlbumId = id;
   const a = id ? albums.find(x => x.id === id) : null;
   document.getElementById('album-form-title').textContent = a ? `Edit: ${a.title}` : 'New Album';
+  document.getElementById('ab-id').value = a?.id || '';
   document.getElementById('ab-artist').value = a?.artist_id || '';
   document.getElementById('ab-title').value = a?.title || '';
   document.getElementById('ab-slug').value = a?.slug || '';
@@ -518,7 +592,18 @@ function showAlbumForm(id) {
   document.getElementById('ab-upc').value = a?.upc || '';
   document.getElementById('ab-timing-url').value = a?.timing_base_url || '';
   document.getElementById('ab-audio-url').value = a?.audio_base_url || '';
-  // Re-populate artist select and keep selection
+  // Show/hide view link and delete button
+  const viewLink = document.getElementById('ab-view-link');
+  const delBtn = document.getElementById('ab-delete-btn');
+  if (a) {
+    viewLink.href = '/us/album/' + esc(a.slug);
+    viewLink.style.display = 'inline-flex';
+    delBtn.style.display = 'inline-flex';
+    delBtn.dataset.id = a.id;
+  } else {
+    viewLink.style.display = 'none';
+    delBtn.style.display = 'none';
+  }
   populateArtistSelect();
   if (a) document.getElementById('ab-artist').value = a.artist_id;
 }
@@ -546,6 +631,15 @@ async function saveAlbum() {
       toast('Album created','success');
     }
     await loadAlbums();
+    // Show the generated ID and view link
+    document.getElementById('ab-id').value = albumId;
+    const viewLink = document.getElementById('ab-view-link');
+    viewLink.href = '/us/album/' + slug;
+    viewLink.style.display = 'inline-flex';
+    const delBtn = document.getElementById('ab-delete-btn');
+    delBtn.style.display = 'inline-flex';
+    delBtn.dataset.id = albumId;
+    editingAlbumId = albumId;
   } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
@@ -565,8 +659,13 @@ function filterTracks() {
   if (!filtered.length) { list.innerHTML = '<div class="list-empty">No tracks found.</div>'; return; }
   list.innerHTML = filtered.map(t => `
     <div class="entity-card${t.id === editingTrackId ? ' active' : ''}" onclick="showTrackForm('${esc(t.id)}')">
-      <div class="card-title">#${t.track_number} — ${esc(t.title)}</div>
-      <div class="card-meta"><span class="card-slug">${esc(t.album_title||'—')}</span><span class="card-tag">${Math.round((t.duration_ms||0)/1000)}s</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div class="card-title">#${t.track_number} — ${esc(t.title)}</div>
+          <div class="card-meta"><span class="card-slug">${esc(t.album_title||'—')}</span><span class="card-tag">${Math.round((t.duration_ms||0)/1000)}s</span></div>
+        </div>
+        <button class="btn-danger btn-icon" onclick="event.stopPropagation();confirmDeleteTrack('${esc(t.id)}')" title="Delete track">✕</button>
+      </div>
     </div>
   `).join('');
 }
@@ -581,6 +680,7 @@ function showTrackForm(id) {
   editingTrackId = id;
   const t = id ? tracks.find(x => x.id === id) : null;
   document.getElementById('track-form-title').textContent = t ? `Edit: ${t.title}` : 'New Track';
+  document.getElementById('tr-id').value = t?.id || '';
   document.getElementById('tr-album').value = t?.album_id || '';
   document.getElementById('tr-title').value = t?.title || '';
   document.getElementById('tr-number').value = t?.track_number || 1;
@@ -590,6 +690,25 @@ function showTrackForm(id) {
   document.getElementById('tr-preview').value = t?.preview_url || '';
   document.getElementById('tr-timing').value = t?.timing_json_url || '';
   document.getElementById('tr-isrc').value = t?.isrc || '';
+  // Show/hide view link and delete button
+  const viewLink = document.getElementById('tr-view-link');
+  const delBtn = document.getElementById('tr-delete-btn');
+  const album = t ? albums.find(a => a.id === t.album_id) : null;
+  if (t) {
+    const trackSlug = slugify(t.title);
+    const storefront = 'us';
+    if (album?.is_verse_based) {
+      viewLink.href = `/${storefront}/song/${trackSlug}/${t.track_number}?t=${esc(t.id)}`;
+    } else {
+      viewLink.href = `/${storefront}/song/${trackSlug}/${t.track_number}`;
+    }
+    viewLink.style.display = 'inline-flex';
+    delBtn.style.display = 'inline-flex';
+    delBtn.dataset.id = t.id;
+  } else {
+    viewLink.style.display = 'none';
+    delBtn.style.display = 'none';
+  }
   populateAlbumSelect();
   if (t) document.getElementById('tr-album').value = t.album_id;
 }
@@ -619,6 +738,20 @@ async function saveTrack() {
       toast('Track created','success');
     }
     await loadTracks();
+    // Show the generated ID and view link
+    document.getElementById('tr-id').value = trackId;
+    const viewLink = document.getElementById('tr-view-link');
+    const trackSlug = slugify(title);
+    if (album?.is_verse_based) {
+      viewLink.href = '/us/song/' + trackSlug + '/' + trackNum + '?t=' + trackId;
+    } else {
+      viewLink.href = '/us/song/' + trackSlug + '/' + trackNum;
+    }
+    viewLink.style.display = 'inline-flex';
+    const delBtn = document.getElementById('tr-delete-btn');
+    delBtn.style.display = 'inline-flex';
+    delBtn.dataset.id = trackId;
+    editingTrackId = trackId;
   } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
