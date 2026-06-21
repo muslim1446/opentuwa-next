@@ -37,6 +37,7 @@ interface PlayerContextType {
   setReciter: (id: string) => void; setTrans: (id: string) => void
   setAudioTrans: (id: string) => void
   togglePlayPause: () => void; nextVerse: () => void; prevVerse: () => void
+  goToNextChapter: () => void; goToPrevChapter: () => void
   setVolume: (v: number) => void; toggleMute: () => void
   launchPlayer: (chapterNum: number, verseNum?: number) => void
   loadQuranData: () => Promise<void>
@@ -414,6 +415,26 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     setCurrentVerseIdx(0)
   }, [quranData, currentChapterIdx, shuffleChapters, generateShuffleOrder])
 
+  const goToPrevChapter = useCallback(() => {
+    if (shuffleChapters && shuffleOrderRef.current.length > 0) {
+      const currentPos = shuffleOrderRef.current.indexOf(currentChapterIdx)
+      const prevPos = currentPos - 1
+      if (prevPos >= 0) {
+        setCurrentChapterIdx(shuffleOrderRef.current[prevPos])
+      } else {
+        shuffleOrderRef.current = generateShuffleOrder(quranData.length)
+        setCurrentChapterIdx(shuffleOrderRef.current[shuffleOrderRef.current.length - 1])
+      }
+    } else {
+      if (currentChapterIdx > 0) {
+        setCurrentChapterIdx(currentChapterIdx - 1)
+      } else {
+        setCurrentChapterIdx(quranData.length - 1)
+      }
+    }
+    setCurrentVerseIdx(0)
+  }, [quranData, currentChapterIdx, shuffleChapters, generateShuffleOrder])
+
   const nextVerse = useCallback(() => {
     const ch = quranData[currentChapterIdx]
     if (!ch) return
@@ -608,7 +629,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       toggleShuffle, toggleLoop,
       setChapter: setCurrentChapterIdx, setVerse: setCurrentVerseIdx,
       setReciter: setCurrentReciter, setTrans: setCurrentTrans, setAudioTrans: setCurrentAudioTrans,
-      togglePlayPause, nextVerse, prevVerse,
+      togglePlayPause, nextVerse, prevVerse, goToNextChapter, goToPrevChapter,
       setVolume, toggleMute, launchPlayer, loadQuranData, startPlayback,
     }}>
       {children}

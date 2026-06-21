@@ -1,5 +1,6 @@
 'use client'
 
+import { useRef } from 'react'
 import { usePlayer } from '@/context/PlayerContext'
 import { useI18n } from '@/context/I18nContext'
 import { CustomSelect } from '@/components/ui/CustomSelect'
@@ -11,14 +12,28 @@ export function PlayerIsland() {
   const {
     currentTrans, isPlaying, setTrans, togglePlayPause,
     nextVerse, prevVerse, shuffleChapters, loopChapter,
-    toggleShuffle, toggleLoop,
+    toggleShuffle, toggleLoop, goToNextChapter, goToPrevChapter,
     chapterTitle, currentChapterIdx, displayVerseNumber, quranData,
   } = usePlayer()
   const { translate } = useI18n()
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const holdFired = useRef(false)
 
   const transItems = Object.entries(TRANSLATIONS_CONFIG).map(([k, v]) => ({
     value: k, text: v.name,
   }))
+
+  const cancelHold = () => {
+    if (holdTimer.current) { clearTimeout(holdTimer.current); holdTimer.current = null }
+  }
+
+  const startHold = (chapterFn: () => void) => {
+    holdFired.current = false
+    holdTimer.current = setTimeout(() => {
+      holdFired.current = true
+      chapterFn()
+    }, 500)
+  }
 
   const chapter = quranData[currentChapterIdx]
   const chNum = chapter?.chapterNumber || 0
@@ -42,8 +57,12 @@ export function PlayerIsland() {
 
         <button
           className="island-transport-btn"
-          onClick={prevVerse}
-          aria-label="Previous verse"
+          onClick={() => { if (!holdFired.current) prevVerse(); holdFired.current = false }}
+          onPointerDown={() => startHold(goToPrevChapter)}
+          onPointerUp={cancelHold}
+          onPointerLeave={cancelHold}
+          onContextMenu={(e) => e.preventDefault()}
+          aria-label="Previous verse (hold for chapter)"
           tabIndex={0}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -71,8 +90,12 @@ export function PlayerIsland() {
 
         <button
           className="island-transport-btn"
-          onClick={nextVerse}
-          aria-label="Next verse"
+          onClick={() => { if (!holdFired.current) nextVerse(); holdFired.current = false }}
+          onPointerDown={() => startHold(goToNextChapter)}
+          onPointerUp={cancelHold}
+          onPointerLeave={cancelHold}
+          onContextMenu={(e) => e.preventDefault()}
+          aria-label="Next verse (hold for chapter)"
           tabIndex={0}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">

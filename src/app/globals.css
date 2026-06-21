@@ -812,6 +812,7 @@ body.idle #player-island { transform: translate(-50%, 150%) translateZ(0); opaci
     transition: color 0.15s, transform 0.1s;
     flex-shrink: 0;
     padding: 0;
+    touch-action: manipulation;
 }
 .island-transport-btn:hover { color: #FFFFFF; }
 .island-transport-btn:active { transform: scale(0.88); }
