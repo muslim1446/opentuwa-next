@@ -935,16 +935,16 @@ body.idle #player-island { transform: translate(-50%, 150%) translateZ(0); opaci
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    padding: 12px 16px;
+    padding: 10px 14px;
     background: rgba(30, 30, 30, 0.92);
     backdrop-filter: blur(24px) saturate(160%);
     -webkit-backdrop-filter: blur(24px) saturate(160%);
     border: 0.5px solid rgba(255, 255, 255, 0.08);
     border-radius: 14px;
     corner-shape: superellipse(2);
-    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
     z-index: 3100;
-    width: 230px;
+    width: 210px;
     box-shadow: var(--shadow-elevation-4), var(--edge-occlusion);
 }
 .eq-popover::before {
@@ -1246,29 +1246,69 @@ select:focus, select:hover {
     .island-track-title { font-size: 12px; }
     .island-track-subtitle { font-size: 10px; }
 
-    /* EQ popover → bottom sheet on iPhone */
+    /* --- EQ popover: compact floating card above island --- */
     .eq-popover {
         position: fixed;
-        bottom: 16px;
-        left: 16px;
-        right: 16px;
-        top: auto;
+        bottom: 72px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%) translateY(8px);
         width: auto;
-        transform: translateY(16px);
-        border-radius: 18px;
+        min-width: 180px;
+        max-width: calc(100vw - 24px);
+        padding: 8px 12px;
+        border-radius: 16px;
         corner-shape: superellipse(2);
     }
     .eq-wrap.eq-open .eq-popover {
-        transform: translateY(0);
+        transform: translateX(-50%) translateY(0);
     }
     .eq-popover::before {
-        border-radius: 18px;
+        border-radius: 16px;
     }
     .eq-popover::after {
         display: none;
     }
+    .eq-popover-header {
+        margin-bottom: 6px;
+        padding-bottom: 6px;
+    }
+    .eq-popover-title {
+        font-size: 10px;
+    }
+    .eq-popover-reset {
+        font-size: 10px;
+    }
+    .eq-band-row {
+        gap: 6px;
+        margin-bottom: 4px;
+        min-height: 24px;
+    }
+    .eq-band-label {
+        font-size: 11px;
+        width: 36px;
+    }
+    .eq-band-slider {
+        height: 3px;
+    }
+    .eq-band-slider::-webkit-slider-runnable-track {
+        height: 3px;
+    }
+    .eq-band-slider::-webkit-slider-thumb {
+        width: 18px;
+        height: 18px;
+        margin-top: -7.5px;
+    }
+    .eq-band-slider::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+    }
+    .eq-band-value {
+        font-size: 9px;
+        width: 26px;
+    }
 
-    /* Translation dropdown → ensure visible on iPhone */
+    /* --- Translation dropdown: compact bottom sheet --- */
     #player-island #translationSelectWrapper {
         display: block;
     }
@@ -1276,6 +1316,26 @@ select:focus, select:hover {
         font-size: 11px;
         padding: 0 8px;
         min-height: 32px;
+    }
+    #player-island #translationSelectWrapper .custom-options {
+        width: auto;
+        min-width: 160px;
+        max-width: calc(100vw - 24px);
+        left: 50%;
+        right: auto;
+        margin-left: 0;
+        transform: translateX(-50%) translateY(8px);
+        position: fixed;
+        bottom: 72px;
+        padding: 4px 0;
+        max-height: 50vh;
+    }
+    #player-island #translationSelectWrapper .custom-select-wrapper.open .custom-options {
+        transform: translateX(-50%) translateY(0);
+    }
+    #player-island #translationSelectWrapper .custom-option {
+        padding: 8px 12px;
+        font-size: 13px;
     }
 }
 
@@ -1503,16 +1563,23 @@ h1, h2, h3, h4, h5, h6 {
     .custom-select-wrapper { width: 100%; max-width: none; }
 
     .custom-options {
-        width: calc(100vw - 32px);
-        left: 16px;
+        width: auto;
+        min-width: 180px;
+        max-width: calc(100vw - 24px);
+        left: 50%;
         margin-left: 0;
-        bottom: 16px;
+        bottom: 72px;
         top: auto;
-        transform: translateY(16px);
+        transform: translateX(-50%) translateY(8px);
         position: fixed;
-        max-height: 60vh;
+        max-height: 50vh;
+        padding: 4px 0;
     }
-    .custom-select-wrapper.open .custom-options { transform: translateY(0); }
+    .custom-select-wrapper.open .custom-options { transform: translateX(-50%) translateY(0); }
+    .custom-option {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
 }
 
 body.simple-mode #chapterSelectWrapper,
