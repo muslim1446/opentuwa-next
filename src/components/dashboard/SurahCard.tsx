@@ -12,6 +12,8 @@ export function SurahCard({ chapterNumber, englishName, description, onClick, on
   return (
     <div
       className="surah-card squircle-surface"
+      data-radius-role="root"
+      style={{ '--radius-root': 'var(--radius-card)' } as React.CSSProperties}
       role="button"
       tabIndex={0}
       aria-label={englishName}

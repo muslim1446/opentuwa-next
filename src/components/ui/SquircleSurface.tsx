@@ -8,6 +8,8 @@ interface SquircleSurfaceProps {
   cornerRadius?: number
   cornerSmoothing?: number
   as?: ElementType
+  /** Radius derivation role: "root" for outermost, "concentric" for nested */
+  radiusRole?: 'root' | 'concentric'
   [key: string]: any
 }
 
@@ -17,6 +19,7 @@ export function SquircleSurface({
   cornerRadius = 24,
   cornerSmoothing = 0.6,
   as: Tag = 'div',
+  radiusRole,
   ...props
 }: SquircleSurfaceProps) {
   const ref = useRef<HTMLDivElement>(null) as any
@@ -60,13 +63,22 @@ export function SquircleSurface({
     }
   }, [cornerRadius, cornerSmoothing])
 
+  const tagProps: Record<string, any> = {
+    ref,
+    className: `squircle-surface ${className}`,
+    style: { borderRadius: `${cornerRadius}px` },
+    ...props,
+  }
+
+  if (radiusRole === 'root') {
+    tagProps['data-radius-role'] = 'root'
+    tagProps.style['--radius-root'] = `${cornerRadius}px`
+  } else if (radiusRole === 'concentric') {
+    tagProps['data-radius-role'] = 'concentric'
+  }
+
   return (
-    <Tag
-      ref={ref}
-      className={`squircle-surface ${className}`}
-      style={{ borderRadius: `${cornerRadius}px` }}
-      {...props}
-    >
+    <Tag {...tagProps}>
       {children}
     </Tag>
   )

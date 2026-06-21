@@ -109,7 +109,7 @@ img { object-fit: cover; }
 :focus-visible {
     outline: 3px solid var(--accent-blue);
     outline-offset: 2px;
-    border-radius: 8px;
+    border-radius: var(--radius-xs);
 }
 :focus:not(:focus-visible) { outline: none; }
 
@@ -778,7 +778,7 @@ body.idle #player-island { transform: translate(-50%, 150%) translateZ(0); opaci
 .island-artwork {
     width: 40px;
     height: 40px;
-    border-radius: 6px;
+    border-radius: var(--radius-xs);
     overflow: hidden;
     flex-shrink: 0;
     background: rgba(255, 255, 255, 0.08);
@@ -1221,7 +1221,7 @@ select:focus, select:hover {
         display: none;
     }
     .island-center { gap: 6px; }
-    .island-artwork { width: 34px; height: 34px; border-radius: 5px; }
+    .island-artwork { width: 34px; height: 34px; border-radius: var(--radius-xs); }
     .island-track-title { font-size: 12px; }
     .island-track-subtitle { font-size: 10px; }
 }
@@ -1233,7 +1233,7 @@ select:focus, select:hover {
         border-radius: 999px;
     }
     .island-center { gap: 4px; }
-    .island-artwork { width: 30px; height: 30px; border-radius: 4px; }
+    .island-artwork { width: 30px; height: 30px; border-radius: var(--radius-xs); }
     .island-track-title { font-size: 11px; }
     .island-track-subtitle { display: none; }
     .island-play-btn { width: 32px; height: 32px; }
@@ -1260,7 +1260,7 @@ select:focus, select:hover {
     background: #0A84FF;
     color: #FFFFFF;
     padding: 3px 8px;
-    border-radius: 6px;
+    border-radius: var(--radius-xs);
     margin-left: 8px;
     font-weight: 600;
     letter-spacing: 0.02em;
@@ -1372,7 +1372,7 @@ select:focus, select:hover {
 }
 .custom-options::-webkit-scrollbar-thumb {
     background: var(--text-tertiary);
-    border-radius: 10px;
+    border-radius: var(--radius-xs);
 }
 
 .custom-select-wrapper.open .custom-options {

@@ -24,7 +24,9 @@ export function PlayerIsland() {
   const chNum = chapter?.chapterNumber || 0
 
   return (
-    <div id="player-island" className="liquid-glass" data-shape="capsule">
+    <div id="player-island" className="liquid-glass" data-shape="capsule" data-radius-role="root"
+      style={{ '--radius-root': '9999px' } as React.CSSProperties}
+    >
       <div className="island-left">
         <button
           className={`island-transport-btn shuffle-btn ${shuffleChapters ? 'transport-active' : ''}`}

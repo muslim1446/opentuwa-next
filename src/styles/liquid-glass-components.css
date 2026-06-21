@@ -667,7 +667,22 @@
 }
 
 /* --------------------------------------------------------------------------
-   13. ELEVATION CLASSES
+   13. CORNER-SHAPE PROGRESSIVE ENHANCEMENT (Section A1 — Continuous Corner)
+   -------------------------------------------------------------------------- */
+@supports (corner-shape: superellipse(2)) {
+  .btn-glass,
+  .btn-glass-prominent,
+  .sheet-glass,
+  .alert-glass,
+  .search-bar-glass,
+  .surah-card {
+    corner-shape: superellipse(2);
+  }
+  /* Capsule/pill shapes already have continuous curvature — no enhancement needed */
+}
+
+/* --------------------------------------------------------------------------
+   14. ELEVATION CLASSES
    -------------------------------------------------------------------------- */
 .elevation-0 { box-shadow: var(--shadow-elevation-0); }
 .elevation-1 { box-shadow: var(--shadow-elevation-1); }
