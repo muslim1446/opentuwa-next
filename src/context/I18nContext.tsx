@@ -34,7 +34,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     try {
       const res = await fetch(`/locales/${localeCode}.json`)
       if (res.ok) {
-        const data = await res.json()
+        const data: Record<string, any> = await res.json()
         setTranslations(data)
         document.documentElement.lang = localeCode
         document.documentElement.dir = RTL_CODES.has(localeCode) ? 'rtl' : 'ltr'

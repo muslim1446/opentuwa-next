@@ -8,9 +8,11 @@ import { buildSongMetadata, slugify } from '@/lib/metadata'
 import { songJsonLd, toISO8601Duration } from '@/lib/json-ld'
 import { Breadcrumb } from '@/components/Breadcrumb'
 import { decodeSongId, encodeAlbumId } from '@/lib/entity-ids'
+import { fetchAlbum, fetchArtist, fetchTrack, fetchTracks } from '@/lib/data'
 import HomeClient from '@/app/home-client'
 
 const siteUrl = 'https://muslim.opentuwa.com'
+const DEFAULT_ARTWORK = 'https://opentuwa.com/assets/ui/web_1200.png'
 
 export const revalidate = 86400
 
@@ -18,23 +20,36 @@ export async function generateMetadata({ params }: { params: Promise<{ storefron
   const { storefront, id } = await params
   const decoded = decodeSongId(id)
   if (!decoded) return {}
-  const ch = SURAH_METADATA.find(s => s.chapter === decoded.chapter)
-  if (!ch) return {}
+
+  const track = await fetchTrack(id)
+  const album = track ? await fetchAlbum(track.album_id) : null
+  const artist = track ? await fetchArtist(track.artist_id) : null
+
+  const songName = track?.title || (() => {
+    const ch = SURAH_METADATA.find(s => s.chapter === decoded.chapter)
+    return ch?.english_name || ''
+  })()
+  const artistName = artist?.name || ARTIST_NAME
+  const artistSlug = slugify(artistName)
+  const albumName = album?.title || songName
+  const albumSlug = slugify(albumName)
+  const albumId = album?.id || encodeAlbumId(decoded.chapter)
+  const artworkUrl = album?.artwork_url || DEFAULT_ARTWORK
+  const durationMs = track?.duration_ms || 8000
 
   return buildSongMetadata({
-    name: ch.english_name,
-    artistName: ARTIST_NAME,
-    artistSlug: slugify(ARTIST_NAME),
-    artistId: 'alafasy',
-    albumName: ch.english_name,
-    albumSlug: slugify(ch.english_name),
-    albumId: encodeAlbumId(decoded.chapter),
-    slug: slugify(ch.english_name),
+    name: songName,
+    artistName,
+    artistSlug,
+    artistId: track?.artist_id || 'alafasy',
+    albumName,
+    albumSlug,
+    albumId,
+    slug: slugify(songName),
     id,
     storefront,
-    artworkUrl: 'https://opentuwa.com/assets/ui/web_1200.png',
-    durationSeconds: 8,
-    previewUrl: `https://hosting.opentuwa.com/${String(decoded.chapter).padStart(3, '0')}.wav`,
+    artworkUrl,
+    durationSeconds: Math.round(durationMs / 1000),
     trackNumber: decoded.verse,
   })
 }
@@ -48,26 +63,35 @@ export default async function SongPage({
 
   const decoded = decodeSongId(id)
   if (!decoded) notFound()
-  const ch = SURAH_METADATA.find(s => s.chapter === decoded.chapter)
-  if (!ch) notFound()
 
-  const correctSlug = slugify(ch.english_name)
+  const track = await fetchTrack(id)
+  const album = track ? await fetchAlbum(track.album_id) : null
+  const artist = track ? await fetchArtist(track.artist_id) : null
+
+  const songName = track?.title || (() => {
+    const ch = SURAH_METADATA.find(s => s.chapter === decoded.chapter)
+    return ch?.english_name || ''
+  })()
+  const artistName = artist?.name || ARTIST_NAME
+  const albumName = album?.title || songName
+  const correctSlug = slugify(songName)
+
   if (paramSlug !== correctSlug) {
     redirect(`/${storefront}/song/${correctSlug}/${id}`)
   }
 
   const url = `${siteUrl}/${storefront}/song/${correctSlug}/${id}`
-  const albumId = encodeAlbumId(decoded.chapter)
-  const reciterUrl = `${siteUrl}/${storefront}/reciter/${slugify(ARTIST_NAME)}/alafasy`
-  const albumUrl = `${siteUrl}/${storefront}/album/${correctSlug}/${albumId}`
+  const albumId = album?.id || encodeAlbumId(decoded.chapter)
+  const reciterUrl = `${siteUrl}/${storefront}/reciter/${slugify(artistName)}/${track?.artist_id || 'alafasy'}`
+  const albumUrl = `${siteUrl}/${storefront}/album/${slugify(albumName)}/${albumId}`
 
   const jsonLd = songJsonLd({
-    name: ch.english_name,
+    name: songName,
     url,
-    image: 'https://opentuwa.com/assets/ui/web_1200.png',
-    durationISO8601: toISO8601Duration(8),
-    artist: { name: ARTIST_NAME, url: reciterUrl },
-    album: { name: ch.english_name, url: albumUrl },
+    image: album?.artwork_url || DEFAULT_ARTWORK,
+    durationISO8601: toISO8601Duration(Math.round((track?.duration_ms || 8000) / 1000)),
+    artist: { name: artistName, url: reciterUrl },
+    album: { name: albumName, url: albumUrl },
   })
 
   return (
@@ -79,9 +103,9 @@ export default async function SongPage({
       <Breadcrumb
         items={[
           { name: 'Home', href: `${siteUrl}/${storefront}` },
-          { name: ARTIST_NAME, href: reciterUrl },
-          { name: ch.english_name, href: albumUrl },
-          { name: `Verse ${decoded.verse}`, href: url },
+          { name: artistName, href: reciterUrl },
+          { name: albumName, href: albumUrl },
+          { name: songName, href: url },
         ]}
       />
       <HomeClient />

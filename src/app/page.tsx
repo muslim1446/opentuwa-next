@@ -4,6 +4,7 @@ import { ARTIST_NAME, ALBUM_NAME, PLATFORM_NAME, SITE_URL } from '@/lib/configs'
 import { encodeAlbumId } from '@/lib/entity-ids'
 import { slugify } from '@/lib/metadata'
 import { cookies } from 'next/headers'
+import { fetchAlbums, fetchArtists } from '@/lib/data'
 import HomeClient from './home-client'
 
 export const runtime = 'edge'
@@ -52,14 +53,26 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   await cookies()
 
+  let albums: { chapter: number; english_name: string; description: string }[]
+  try {
+    const a = await fetchAlbums()
+    albums = a.map((x, i) => ({
+      chapter: i + 1,
+      english_name: x.title,
+      description: x.description,
+    }))
+  } catch {
+    albums = SURAH_METADATA
+  }
+
   const itemListJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: `${ALBUM_NAME} by ${ARTIST_NAME}`,
     description: 'Complete collection of 114 chapters.',
-    numberOfItems: 114,
+    numberOfItems: albums.length,
     url: siteUrl,
-    itemListElement: SURAH_METADATA.map((s, i) => ({
+    itemListElement: albums.map((s, i) => ({
       '@type': 'ListItem',
       position: i + 1,
       item: {
@@ -75,7 +88,7 @@ export default async function HomePage() {
         inAlbum: {
           '@type': 'MusicAlbum',
           name: ALBUM_NAME,
-          numTracks: 114,
+          numTracks: albums.length,
         },
       },
     })),

@@ -2,15 +2,16 @@ export const runtime = 'edge'
 
 import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
-import { SURAH_METADATA } from '@/lib/surah-metadata'
-import { RECITERS_CONFIG, ARTIST_NAME, PLATFORM_NAME, DEFAULT_STOREFRONT } from '@/lib/configs'
+import { ARTIST_NAME, PLATFORM_NAME, DEFAULT_STOREFRONT } from '@/lib/configs'
 import { buildAlbumMetadata, buildSongMetadata, slugify } from '@/lib/metadata'
 import { albumJsonLd, toISO8601Duration } from '@/lib/json-ld'
 import { Breadcrumb } from '@/components/Breadcrumb'
 import { decodeAlbumId, decodeSongId, encodeAlbumId, encodeSongId } from '@/lib/entity-ids'
+import { fetchAlbum, fetchArtist, fetchTracks } from '@/lib/data'
 import HomeClient from '@/app/home-client'
 
 const siteUrl = 'https://muslim.opentuwa.com'
+const DEFAULT_ARTWORK = 'https://opentuwa.com/assets/ui/web_1200.png'
 
 export const revalidate = 86400
 
@@ -26,49 +27,48 @@ export async function generateMetadata({
 
   const decoded = decodeAlbumId(id)
   if (!decoded) return {}
-  const ch = SURAH_METADATA.find(s => s.chapter === decoded.chapter)
-  if (!ch) return {}
+  const album = await fetchAlbum(id)
+  if (!album) return {}
+  const artist = await fetchArtist(album.artist_id)
 
-  // When ?i= is present (deep-link to a specific track), canonical points to the song page
-  // and we set noindex to avoid duplicate-content dilution (see guide §1)
+  const artistName = artist?.name || ARTIST_NAME
+  const artistSlug = slugify(artistName)
+
   if (songId) {
     const songDecoded = decodeSongId(songId)
     if (songDecoded) {
-      const songSlug = slugify(ch.english_name)
+      const songSlug = slugify(album.title)
       const meta = buildSongMetadata({
-        name: ch.english_name,
-        artistName: ARTIST_NAME,
-        artistSlug: slugify(ARTIST_NAME),
-        artistId: 'alafasy',
-        albumName: ch.english_name,
+        name: album.title,
+        artistName,
+        artistSlug,
+        artistId: album.artist_id,
+        albumName: album.title,
         albumSlug: songSlug,
         albumId: id,
         slug: songSlug,
         id: songId,
         storefront,
-        artworkUrl: 'https://opentuwa.com/assets/ui/web_1200.png',
-        durationSeconds: 8,
+        artworkUrl: album.artwork_url || DEFAULT_ARTWORK,
+        durationSeconds: Math.round((album.total_duration_ms || 8000) / 1000),
         trackNumber: songDecoded.verse,
       })
       return { ...meta, robots: { index: false, follow: true } }
     }
   }
 
-  const verseCountMatch = ch.description?.match(/\((\d+) verses?\)/)
-  const trackCount = verseCountMatch ? parseInt(verseCountMatch[1]) : 0
-
   return buildAlbumMetadata({
-    name: ch.english_name,
-    artistName: ARTIST_NAME,
-    artistSlug: slugify(ARTIST_NAME),
-    artistId: 'alafasy',
-    slug: slugify(ch.english_name),
+    name: album.title,
+    artistName,
+    artistSlug,
+    artistId: album.artist_id,
+    slug: slugify(album.title),
     id,
     storefront,
-    artworkUrl: 'https://opentuwa.com/assets/ui/web_1200.png',
-    trackCount,
-    releaseDate: '',
-    genres: ['Quran', 'Recitation'],
+    artworkUrl: album.artwork_url || DEFAULT_ARTWORK,
+    trackCount: album.track_count,
+    releaseDate: album.release_date || '',
+    genres: album.genre ? [album.genre] : ['Quran', 'Recitation'],
   })
 }
 
@@ -84,11 +84,14 @@ export default async function AlbumPage({
 
   const decoded = decodeAlbumId(id)
   if (!decoded) notFound()
-  const chNum = decoded.chapter
-  const ch = SURAH_METADATA.find(s => s.chapter === chNum)
-  if (!ch) notFound()
 
-  const correctSlug = slugify(ch.english_name)
+  const album = await fetchAlbum(id)
+  if (!album) notFound()
+  const artist = await fetchArtist(album.artist_id)
+
+  const artistName = artist?.name || ARTIST_NAME
+  const correctSlug = slugify(album.title)
+
   if (paramSlug !== correctSlug) {
     const target = `/${storefront}/album/${correctSlug}/${id}`
     const qs = new URLSearchParams()
@@ -101,21 +104,20 @@ export default async function AlbumPage({
   }
 
   const url = `${siteUrl}/${storefront}/album/${correctSlug}/${id}`
-  const verseCountMatch = ch.description?.match(/\((\d+) verses?\)/)
-  const verseCount = verseCountMatch ? parseInt(verseCountMatch[1]) : 0
+  const artistUrl = `${siteUrl}/${storefront}/reciter/${slugify(artistName)}/${album.artist_id}`
 
-  const tracks = Array.from({ length: verseCount }, (_, i) => ({
+  const tracks = Array.from({ length: album.track_count }, (_, i) => ({
     name: `Verse ${i + 1}`,
-    durationISO8601: toISO8601Duration(8),
+    durationISO8601: toISO8601Duration(Math.round((album.total_duration_ms || 8000) / album.track_count / 1000) || 8),
     position: i + 1,
   }))
 
   const jsonLd = albumJsonLd({
-    name: ch.english_name,
+    name: album.title,
     url,
-    image: 'https://opentuwa.com/assets/ui/web_1200.png',
-    datePublished: '',
-    artist: { name: ARTIST_NAME, url: `${siteUrl}/${storefront}/reciter/${slugify(ARTIST_NAME)}/alafasy` },
+    image: album.artwork_url || DEFAULT_ARTWORK,
+    datePublished: album.release_date || '',
+    artist: { name: artistName, url: artistUrl },
     tracks,
   })
 
@@ -128,8 +130,8 @@ export default async function AlbumPage({
       <Breadcrumb
         items={[
           { name: 'Home', href: `${siteUrl}/${storefront}` },
-          { name: ARTIST_NAME, href: `${siteUrl}/${storefront}/reciter/${slugify(ARTIST_NAME)}/alafasy` },
-          { name: ch.english_name, href: url },
+          { name: artistName, href: artistUrl },
+          { name: album.title, href: url },
         ]}
       />
       <HomeClient />

@@ -2,3 +2,8 @@ name = "opentuwa"
 compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = ".vercel/output/static"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "opentuwa-prod"
+database_id = "ce8e1a0d-5578-4b7a-af38-11f68af50fd7"
