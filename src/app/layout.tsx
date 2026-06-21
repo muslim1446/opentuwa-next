@@ -3,13 +3,12 @@ import './globals.css'
 import { Providers } from './providers'
 import { ClientInit } from './client-init'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://muslim.opentuwa.com'
-const SITE_NAME = 'Tuwa'
+const siteUrl = 'https://muslim.opentuwa.com'
 
 export const metadata: Metadata = {
   title: {
-    default: `${SITE_NAME} - Web Player`,
-    template: `%s | ${SITE_NAME}`,
+    default: 'Tuwa - Web Player',
+    template: '%s | Tuwa',
   },
   description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations. Built for deep focus.',
   authors: [{ name: 'Tuwa Media' }],
@@ -22,23 +21,23 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   openGraph: {
     type: 'website',
-    siteName: SITE_NAME,
+    siteName: 'Tuwa',
     locale: 'en_US',
     url: siteUrl,
-    title: `${SITE_NAME} - Web Player`,
+    title: 'Tuwa - Web Player',
     description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
     images: [
       {
         url: 'https://opentuwa.com/assets/ui/web_1200.png',
         width: 1200,
         height: 630,
-        alt: `${SITE_NAME} - Quran Audio Player`,
+        alt: 'Tuwa - Quran Audio Player',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${SITE_NAME} - Web Player`,
+    title: 'Tuwa - Web Player',
     description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
     site: '@opentuwa',
     images: ['https://opentuwa.com/assets/ui/web_1200.png'],
@@ -54,20 +53,10 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'black-translucent',
-    title: SITE_NAME,
-  },
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
-  },
   other: {
-    'apple-itunes-app': `app-id=YOUR_APP_ID, app-argument=${siteUrl}/en`,
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
-    'apple-mobile-web-app-title': SITE_NAME,
+    'apple-mobile-web-app-title': 'Tuwa',
     'mobile-web-app-capable': 'yes',
   },
 }
@@ -86,8 +75,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const websiteJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: SITE_NAME,
-    alternateName: `${SITE_NAME} Quran Audio Player`,
+    name: 'Tuwa',
+    alternateName: 'Tuwa Quran Audio Player',
     url: siteUrl,
     description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
     publisher: {
@@ -105,7 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${siteUrl}/en/search?term={search_term_string}`,
+        urlTemplate: `${siteUrl}/?search={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
@@ -115,8 +104,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: SITE_NAME,
-    alternateName: `${SITE_NAME} Quran Audio Player`,
+    name: 'Tuwa',
+    alternateName: 'Tuwa Quran Audio Player',
     applicationCategory: 'MusicApplication',
     operatingSystem: 'Web, iOS, tvOS, Android',
     offers: {
@@ -131,13 +120,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       url: siteUrl,
     },
     description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.8',
+      ratingCount: '32000000',
+      bestRating: '5',
+      worstRating: '1',
+    },
   }
 
   return (
     <html lang="en" dir="auto" suppressHydrationWarning>
       <head>
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="application-name" content={SITE_NAME} />
+        <meta name="application-name" content="Tuwa" />
         <meta name="apple-mobile-web-app-orientations" content="portrait-primary" />
         <meta name="format-detection" content="telephone=no" />
         <link rel="icon" type="image/png" href="https://opentuwa.com/assets/ui/favicon-96x96.png" sizes="96x96" />
