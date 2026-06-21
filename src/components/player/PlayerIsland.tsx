@@ -24,7 +24,7 @@ export function PlayerIsland() {
   const chNum = chapter?.chapterNumber || 0
 
   return (
-    <div id="player-island">
+    <div id="player-island" className="liquid-glass" data-shape="capsule">
       <div className="island-left">
         <button
           className={`island-transport-btn shuffle-btn ${shuffleChapters ? 'transport-active' : ''}`}
@@ -95,7 +95,7 @@ export function PlayerIsland() {
       </div>
 
       <div className="island-center">
-        <div className="island-artwork">
+        <div className="island-artwork squircle-surface" data-shape="fixed">
           <img
             src="https://opentuwa.com/assets/ui/favicon.svg"
             alt=""
