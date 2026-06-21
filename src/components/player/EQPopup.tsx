@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { EQ_BANDS } from '@/lib/configs'
 
 const LS_KEY = 'tuwa_eq_v1'
@@ -22,7 +23,9 @@ function formatGain(g: number) {
 export function EQPopup() {
   const [isOpen, setIsOpen] = useState(false)
   const [gains, setGains] = useState<Record<number, number>>(loadGains)
+  const [isMobile, setIsMobile] = useState(false)
   const wrapRef = useRef<HTMLDivElement>(null)
+  const portalRef = useRef<HTMLDivElement>(null)
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   const audioCtxRef = useRef<AudioContext | null>(null)
@@ -96,14 +99,23 @@ export function EQPopup() {
   }, [gains, applyGains])
 
   useEffect(() => {
+    const mq = window.matchMedia('(max-width: 480px)')
+    setIsMobile(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
+  useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        if (isMobile && portalRef.current?.contains(e.target as Node)) return
         setIsOpen(false)
       }
     }
     document.addEventListener('click', handleClick)
     return () => document.removeEventListener('click', handleClick)
-  }, [])
+  }, [isMobile])
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -134,6 +146,32 @@ export function EQPopup() {
     closeTimerRef.current = setTimeout(() => setIsOpen(false), 500)
   }
 
+  const popoverContent = (
+    <div className="eq-popover">
+      <div className="eq-popover-header">
+        <span className="eq-popover-title">Equalizer</span>
+        <button className="eq-popover-reset" onClick={handleReset}>Reset</button>
+      </div>
+      {EQ_BANDS.map((band, i) => (
+        <div key={band.label} className="eq-band-row">
+          <span className="eq-band-label">{band.label}</span>
+          <input
+            ref={el => { if (el) sliderElsRef.current[i] = el }}
+            type="range"
+            className="eq-band-slider"
+            min={-12}
+            max={12}
+            step={0.5}
+            value={gains[i] ?? 0}
+            onChange={(e) => handleSliderChange(i, parseFloat(e.target.value))}
+            aria-label={`${band.label} gain`}
+          />
+          <span className="eq-band-value">{formatGain(gains[i] ?? 0)}</span>
+        </div>
+      ))}
+    </div>
+  )
+
   return (
     <div
       ref={wrapRef}
@@ -141,29 +179,10 @@ export function EQPopup() {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="eq-popover">
-        <div className="eq-popover-header">
-          <span className="eq-popover-title">Equalizer</span>
-          <button className="eq-popover-reset" onClick={handleReset}>Reset</button>
-        </div>
-        {EQ_BANDS.map((band, i) => (
-          <div key={band.label} className="eq-band-row">
-            <span className="eq-band-label">{band.label}</span>
-            <input
-              ref={el => { if (el) sliderElsRef.current[i] = el }}
-              type="range"
-              className="eq-band-slider"
-              min={-12}
-              max={12}
-              step={0.5}
-              value={gains[i] ?? 0}
-              onChange={(e) => handleSliderChange(i, parseFloat(e.target.value))}
-              aria-label={`${band.label} gain`}
-            />
-            <span className="eq-band-value">{formatGain(gains[i] ?? 0)}</span>
-          </div>
-        ))}
-      </div>
+      {isOpen && isMobile ? createPortal(
+        <div ref={portalRef} className="mobile-popover-portal">{popoverContent}</div>,
+        document.body
+      ) : popoverContent}
       <button
         id="eq-btn"
         className={'island-icon-btn' + (isOpen ? ' eq-active' : '')}
