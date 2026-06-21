@@ -1,3 +1,5 @@
+export const runtime = 'edge'
+
 import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { SURAH_METADATA } from '@/lib/surah-metadata'
@@ -8,13 +10,6 @@ import { Breadcrumb } from '@/components/Breadcrumb'
 import HomeClient from '@/app/home-client'
 
 const siteUrl = 'https://muslim.opentuwa.com'
-
-export async function generateStaticParams() {
-  return SURAH_METADATA.map((s) => ({
-    slug: slugify(s.english_name),
-    id: String(s.chapter),
-  }))
-}
 
 export const revalidate = 86400
 

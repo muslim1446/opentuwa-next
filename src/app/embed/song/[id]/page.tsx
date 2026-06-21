@@ -1,3 +1,5 @@
+export const runtime = 'edge'
+
 import type { Metadata } from 'next'
 import { SURAH_METADATA } from '@/lib/surah-metadata'
 import { ARTIST_NAME } from '@/lib/configs'

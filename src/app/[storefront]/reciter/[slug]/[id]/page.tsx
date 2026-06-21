@@ -1,3 +1,5 @@
+export const runtime = 'edge'
+
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { RECITERS_CONFIG } from '@/lib/configs'
@@ -8,13 +10,6 @@ import { Breadcrumb } from '@/components/Breadcrumb'
 import Link from 'next/link'
 
 const siteUrl = 'https://muslim.opentuwa.com'
-
-export async function generateStaticParams() {
-  return Object.entries(RECITERS_CONFIG).map(([id, reciter]) => ({
-    slug: slugify(reciter.name),
-    id,
-  }))
-}
 
 export const revalidate = 86400
 

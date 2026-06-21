@@ -1,3 +1,5 @@
+export const runtime = 'edge'
+
 import Link from 'next/link'
 import { SURAH_METADATA } from '@/lib/surah-metadata'
 import { RECITERS_CONFIG } from '@/lib/configs'

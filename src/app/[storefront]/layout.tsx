@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 
+export const runtime = 'edge'
+
 const siteUrl = 'https://muslim.opentuwa.com'
 
 export async function generateMetadata({ params }: { params: Promise<{ storefront: string }> }): Promise<Metadata> {
