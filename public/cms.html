@@ -337,6 +337,7 @@ function saveToken() {
   if (t) localStorage.setItem('cms_token', t);
   closeModal('token-modal');
   toast('Token saved','success');
+  loadData();
 }
 function showTokenModal() {
   document.getElementById('cms-token-input').value = getToken();
