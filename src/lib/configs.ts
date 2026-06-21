@@ -1,9 +1,19 @@
 import { TranslationConfig, ReciterConfig, TranslationAudioConfig } from './types'
 
-export const ARTIST_NAME = 'Mishari Rashid Alafasy'
-export const ALBUM_NAME = 'The Quran'
-export const HOMEPAGE_TITLE = 'Tuwa - Web Player'
-export const CHAPTER_TITLE_SUFFIX = ' - Tuwa Audio'
+function env(key: string, fallback: string): string {
+  return (typeof process !== 'undefined' && process.env?.[key]) || fallback
+}
+
+export const SITE_URL = env('NEXT_PUBLIC_SITE_URL', 'https://muslim.opentuwa.com')
+
+export const ARTIST_NAME = env('NEXT_PUBLIC_ARTIST_NAME', 'Mishari Rashid Alafasy')
+export const ARTIST_ID = env('NEXT_PUBLIC_ARTIST_ID', 'alafasy')
+export const ALBUM_NAME = env('NEXT_PUBLIC_ALBUM_NAME', 'The Quran')
+export const PLATFORM_NAME = env('NEXT_PUBLIC_PLATFORM_NAME', 'Tuwa')
+export const HOMEPAGE_TITLE = env('NEXT_PUBLIC_HOMEPAGE_TITLE', `${PLATFORM_NAME} - Web Player`)
+export const CHAPTER_TITLE_SUFFIX = env('NEXT_PUBLIC_CHAPTER_TITLE_SUFFIX', ` - ${PLATFORM_NAME} Audio`)
+export const DEFAULT_STOREFRONT = env('NEXT_PUBLIC_DEFAULT_STOREFRONT', 'us')
+export const APPLE_APP_ID = env('NEXT_PUBLIC_APPLE_APP_ID', 'YOUR_APP_ID')
 
 export const TRANSLATIONS_CONFIG: Record<string, TranslationConfig> = {
   'en': { name: 'English', url: 'https://raw.githubusercontent.com/Quran-lite-pages-dev/Quran-lite.pages.dev/refs/heads/master/assets/data/translations/en.xml' },
@@ -86,7 +96,7 @@ export const KEYBOARD_KEYS = [
   '1','2','3','4','5','6','7','8','9','0','SPACE', 'DEL', 'CLEAR',
 ]
 
-export const SUPPORTED_LOCALES = ['en', 'ar', 'es', 'fr', 'he', 'zh']
+export const SUPPORTED_LOCALES = ['us', 'gb', 'sa', 'ae', 'my', 'id']
 
 export const EQ_BANDS = [
   { label: 'Bass', freq: 80, type: 'lowshelf' as const, Q: 0.7 },

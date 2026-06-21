@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { RECITERS_CONFIG } from '@/lib/configs'
 import { SURAH_METADATA } from '@/lib/surah-metadata'
 import { buildArtistMetadata, slugify } from '@/lib/metadata'
+import { encodeAlbumId } from '@/lib/entity-ids'
 import { artistJsonLd } from '@/lib/json-ld'
 import { Breadcrumb } from '@/components/Breadcrumb'
 import Link from 'next/link'
@@ -53,7 +54,7 @@ export default async function ReciterPage({ params }: { params: Promise<{ storef
       <Breadcrumb
         items={[
           { name: 'Home', href: `${siteUrl}/${storefront}` },
-          { name: 'Reciters', href: `${siteUrl}/${storefront}` },
+          { name: 'Artists', href: `${siteUrl}/${storefront}` },
           { name: reciter.name, href: url },
         ]}
       />
@@ -63,49 +64,52 @@ export default async function ReciterPage({ params }: { params: Promise<{ storef
           {reciter.name}
         </h1>
         <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: 32, fontSize: 17 }}>
-          Quran Reciter
+          Artist
         </p>
 
         <section>
           <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16, letterSpacing: '-0.02em' }}>
-            Surahs
+            Albums
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
-            {SURAH_METADATA.map((surah) => (
-              <Link
-                key={surah.chapter}
-                href={`/${storefront}/surah/${slugify(surah.english_name)}/${surah.chapter}?reciter=${id}`}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '12px 16px',
-                  borderRadius: 12,
-                  background: 'rgba(255,255,255,0.03)',
-                  textDecoration: 'none',
-                  color: 'rgba(255,255,255,0.8)',
-                  fontSize: 14,
-                  transition: 'background 0.2s',
-                }}
-              >
-                <span style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: 8,
-                  background: 'rgba(255,255,255,0.08)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: 'rgba(255,255,255,0.4)',
-                  flexShrink: 0,
-                }}>
-                  {surah.chapter}
-                </span>
-                <span>{surah.english_name}</span>
-              </Link>
-            ))}
+            {SURAH_METADATA.map((surah) => {
+              const albumId = encodeAlbumId(surah.chapter)
+              return (
+                <Link
+                  key={surah.chapter}
+                  href={`/${storefront}/album/${slugify(surah.english_name)}/${albumId}`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '12px 16px',
+                    borderRadius: 12,
+                    background: 'rgba(255,255,255,0.03)',
+                    textDecoration: 'none',
+                    color: 'rgba(255,255,255,0.8)',
+                    fontSize: 14,
+                    transition: 'background 0.2s',
+                  }}
+                >
+                  <span style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 8,
+                    background: 'rgba(255,255,255,0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: 'rgba(255,255,255,0.4)',
+                    flexShrink: 0,
+                  }}>
+                    {surah.chapter}
+                  </span>
+                  <span>{surah.english_name}</span>
+                </Link>
+              )
+            })}
           </div>
         </section>
       </div>

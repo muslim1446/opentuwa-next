@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
+import { SITE_URL, PLATFORM_NAME } from '@/lib/configs'
 
-const SITE = 'https://muslim.opentuwa.com'
-const SITE_NAME = 'Tuwa'
+const SITE = SITE_URL || 'https://muslim.opentuwa.com'
+const SITE_NAME = PLATFORM_NAME || 'Tuwa'
 
 export function buildAlbumMetadata(album: {
   name: string
@@ -16,16 +17,16 @@ export function buildAlbumMetadata(album: {
   releaseDate: string
   genres: string[]
 }): Metadata {
-  const url = `${SITE}/${album.storefront}/surah/${album.slug}/${album.id}`
+  const url = `${SITE}/${album.storefront}/album/${album.slug}/${album.id}`
   const title = `${album.name} by ${album.artistName} on ${SITE_NAME}`
-  const description = `Listen to ${album.name} by ${album.artistName} on ${SITE_NAME}. ${album.trackCount} verses.`
+  const description = `Listen to ${album.name} by ${album.artistName} on ${SITE_NAME}. ${album.trackCount} songs.`
 
   return {
     title,
     description,
     alternates: {
       canonical: url,
-      languages: buildHreflangMap('surah', album.slug, album.id),
+      languages: buildHreflangMap('album', album.slug, album.id),
     },
     openGraph: {
       type: 'music.album',
@@ -62,18 +63,17 @@ export function buildSongMetadata(song: {
   durationSeconds: number
   previewUrl?: string
 }): Metadata {
-  const url = `${SITE}/${song.storefront}/surah/${song.slug}/${song.id}?i=${song.id}`
-  const canonicalUrl = `${SITE}/${song.storefront}/surah/${song.slug}/${song.id}`
-  const title = `${song.name} — Verse by ${song.artistName} on ${SITE_NAME}`
+  const url = `${SITE}/${song.storefront}/song/${song.slug}/${song.id}`
+  const title = `${song.artistName} — ${song.name} on ${SITE_NAME}`
   const description = `Listen to ${song.name} by ${song.artistName} on ${SITE_NAME}.`
   const artistUrl = `${SITE}/${song.storefront}/reciter/${song.artistSlug}/${song.artistId}`
-  const albumUrl = `${SITE}/${song.storefront}/surah/${song.albumSlug}/${song.albumId}`
+  const albumUrl = `${SITE}/${song.storefront}/album/${song.albumSlug}/${song.albumId}`
 
   return {
     title,
     description,
     alternates: {
-      canonical: canonicalUrl,
+      canonical: url,
     },
     openGraph: {
       type: 'music.song',
@@ -110,7 +110,7 @@ export function buildArtistMetadata(artist: {
 }): Metadata {
   const url = `${SITE}/${artist.storefront}/reciter/${artist.slug}/${artist.id}`
   const title = `${artist.name} on ${SITE_NAME}`
-  const description = `Listen to ${artist.name} on ${SITE_NAME}. Recitations including ${artist.topTracks.slice(0, 3).join(', ')}.`
+  const description = `Listen to ${artist.name} on ${SITE_NAME}. Songs including ${artist.topTracks.slice(0, 3).join(', ')}.`
   const image = artist.artworkUrl || 'https://opentuwa.com/assets/ui/web_1200.png'
 
   return {
@@ -137,42 +137,6 @@ export function buildArtistMetadata(artist: {
   }
 }
 
-export function buildPlaylistMetadata(playlist: {
-  name: string
-  curatorName: string
-  slug: string
-  id: string
-  storefront: string
-  description: string
-  artworkUrl: string
-}): Metadata {
-  const url = `${SITE}/${playlist.storefront}/playlist/${playlist.slug}/${playlist.id}`
-  const title = `${playlist.name} — Playlist by ${playlist.curatorName} on ${SITE_NAME}`
-
-  return {
-    title,
-    description: playlist.description,
-    alternates: {
-      canonical: url,
-    },
-    openGraph: {
-      type: 'music.playlist',
-      title,
-      description: playlist.description,
-      url,
-      siteName: SITE_NAME,
-      images: [{ url: playlist.artworkUrl, width: 1200, height: 1200 }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description: playlist.description,
-      images: [playlist.artworkUrl],
-    },
-    robots: { index: true, follow: true },
-  }
-}
-
 export function buildSearchMetadata(term?: string): Metadata {
   if (term) {
     return {
@@ -191,10 +155,12 @@ export function buildSearchMetadata(term?: string): Metadata {
 }
 
 function buildHreflangMap(entityType: string, slug: string, id: string): Record<string, string> {
-  const storefronts = ['en', 'ar', 'es', 'fr', 'he', 'zh']
-  return Object.fromEntries(
-    storefronts.map((sf) => [sf, `${SITE}/${sf}/${entityType}/${slug}/${id}`])
-  )
+  return {
+    en: `${SITE}/us/${entityType}/${slug}/${id}`,
+    ar: `${SITE}/sa/${entityType}/${slug}/${id}`,
+    ms: `${SITE}/my/${entityType}/${slug}/${id}`,
+    id: `${SITE}/id/${entityType}/${slug}/${id}`,
+  }
 }
 
 export function slugify(name: string): string {

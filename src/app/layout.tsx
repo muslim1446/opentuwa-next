@@ -2,13 +2,16 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { Providers } from './providers'
 import { ClientInit } from './client-init'
+import { SITE_URL, PLATFORM_NAME, APPLE_APP_ID } from '@/lib/configs'
 
-const siteUrl = 'https://muslim.opentuwa.com'
+const siteUrl = SITE_URL
+const platform = PLATFORM_NAME
+const appleId = APPLE_APP_ID
 
 export const metadata: Metadata = {
   title: {
-    default: 'Tuwa - Web Player',
-    template: '%s | Tuwa',
+    default: `${platform} - Web Player`,
+    template: `%s | ${platform}`,
   },
   description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations. Built for deep focus.',
   authors: [{ name: 'Tuwa Media' }],
@@ -18,39 +21,37 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
     languages: {
-      en: `${siteUrl}/en`,
-      ar: `${siteUrl}/ar`,
-      es: `${siteUrl}/es`,
-      fr: `${siteUrl}/fr`,
-      he: `${siteUrl}/he`,
-      zh: `${siteUrl}/zh`,
+      en: `${siteUrl}/us`,
+      ar: `${siteUrl}/sa`,
+      ms: `${siteUrl}/my`,
+      id: `${siteUrl}/id`,
     },
   },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Tuwa',
+    title: platform,
   },
   openGraph: {
     type: 'website',
-    siteName: 'Tuwa',
+    siteName: platform,
     locale: 'en_US',
     url: siteUrl,
-    title: 'Tuwa - Web Player',
+    title: `${platform} - Web Player`,
     description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
     images: [
       {
         url: 'https://opentuwa.com/assets/ui/web_1200.png',
         width: 1200,
         height: 630,
-        alt: 'Tuwa - Quran Audio Player',
+        alt: `${platform} - Audio Player`,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Tuwa - Web Player',
+    title: `${platform} - Web Player`,
     description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
     site: '@opentuwa',
     images: ['https://opentuwa.com/assets/ui/web_1200.png'],
@@ -69,9 +70,9 @@ export const metadata: Metadata = {
   other: {
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
-    'apple-mobile-web-app-title': 'Tuwa',
+    'apple-mobile-web-app-title': platform,
     'mobile-web-app-capable': 'yes',
-    'apple-itunes-app': 'app-id=YOUR_APP_ID, app-argument=https://muslim.opentuwa.com',
+    'apple-itunes-app': `app-id=${appleId}, app-argument=${siteUrl}`,
   },
 }
 
@@ -89,10 +90,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const websiteJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Tuwa',
-    alternateName: 'Tuwa Quran Audio Player',
+    name: platform,
+    alternateName: `${platform} Audio Player`,
     url: siteUrl,
-    description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
+    description: 'Premium distraction-free audio streaming with verse-by-verse navigation and multiple artists.',
     publisher: {
       '@type': 'Organization',
       name: 'Tuwa Media',
@@ -108,7 +109,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${siteUrl}/?search={search_term_string}`,
+        urlTemplate: `${siteUrl}/us/search?term={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
@@ -118,8 +119,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Tuwa',
-    alternateName: 'Tuwa Quran Audio Player',
+    name: platform,
+    alternateName: `${platform} Audio Player`,
     applicationCategory: 'MusicApplication',
     operatingSystem: 'Web, iOS, tvOS, Android',
     offers: {
@@ -133,7 +134,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       name: 'Tuwa Media',
       url: siteUrl,
     },
-    description: 'Premium distraction-free Quran audio streaming with verse-by-verse navigation, multiple reciters, and 50+ translations.',
+    description: 'Premium distraction-free audio streaming with verse-by-verse navigation and multiple artists.',
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: '4.8',
@@ -155,7 +156,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#1C1C1E" />
-        <meta name="apple-itunes-app" content="app-id=YOUR_APP_ID, app-argument=https://muslim.opentuwa.com" />
+        <meta name="apple-itunes-app" content={`app-id=${appleId}, app-argument=${siteUrl}`} />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <link rel="icon" type="image/png" href="https://opentuwa.com/assets/ui/favicon-96x96.png" sizes="96x96" />
         <link rel="icon" type="image/svg+xml" href="https://opentuwa.com/assets/ui/favicon.svg" />

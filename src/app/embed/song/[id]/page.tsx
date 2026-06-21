@@ -2,29 +2,31 @@ export const runtime = 'edge'
 
 import type { Metadata } from 'next'
 import { SURAH_METADATA } from '@/lib/surah-metadata'
-import { ARTIST_NAME } from '@/lib/configs'
+import { ARTIST_NAME, PLATFORM_NAME } from '@/lib/configs'
+import { decodeSongId } from '@/lib/entity-ids'
 
 const siteUrl = 'https://muslim.opentuwa.com'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params
-  const [chNum] = id.split('-').map(Number)
+  const decoded = decodeSongId(id)
+  const chNum = decoded?.chapter || 1
   const ch = SURAH_METADATA.find(s => s.chapter === chNum)
-  const title = ch ? `${ch.english_name} — ${ARTIST_NAME}` : 'Tuwa Audio'
+  const title = ch ? `${ARTIST_NAME} — ${ch.english_name}` : `${PLATFORM_NAME} Audio`
 
   return {
     title,
-    description: ch?.description || 'Quran audio playback',
+    description: ch?.description || 'Audio playback',
     openGraph: {
       title,
       description: ch?.description,
-      siteName: 'Tuwa',
+      siteName: PLATFORM_NAME,
       images: [{ url: 'https://opentuwa.com/assets/ui/web_1200.png', width: 1200, height: 1200 }],
     },
     twitter: {
       card: 'player',
       title,
-      description: ch?.description || 'Quran audio playback',
+      description: ch?.description || 'Audio playback',
       images: ['https://opentuwa.com/assets/ui/web_1200.png'],
       players: {
         playerUrl: `${siteUrl}/embed/song/${id}`,
@@ -39,9 +41,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function EmbedSongPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const [chNum, vNum] = id.split('-').map(Number)
+  const decoded = decodeSongId(id)
+  const chNum = decoded?.chapter || 1
   const ch = SURAH_METADATA.find(s => s.chapter === chNum)
-  const padCh = String(chNum || 1).padStart(3, '0')
+  const padCh = String(chNum).padStart(3, '0')
 
   return (
     <div style={{
@@ -57,7 +60,7 @@ export default async function EmbedSongPage({ params }: { params: Promise<{ id: 
       boxSizing: 'border-box',
     }}>
       <div style={{ fontSize: 14, fontWeight: 600, opacity: 0.4, marginBottom: 8 }}>
-        Surah {chNum}
+        Track {chNum}
       </div>
       <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 4, textAlign: 'center' }}>
         {ch?.english_name || `Chapter ${chNum}`}

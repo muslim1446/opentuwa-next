@@ -17,12 +17,10 @@ export async function generateMetadata({ params }: { params: Promise<{ storefron
     alternates: {
       canonical: `${siteUrl}/${storefront}`,
       languages: {
-        en: `${siteUrl}/en`,
-        ar: `${siteUrl}/ar`,
-        es: `${siteUrl}/es`,
-        fr: `${siteUrl}/fr`,
-        he: `${siteUrl}/he`,
-        zh: `${siteUrl}/zh`,
+        en: `${siteUrl}/us`,
+        ar: `${siteUrl}/sa`,
+        ms: `${siteUrl}/my`,
+        id: `${siteUrl}/id`,
       },
     },
   }

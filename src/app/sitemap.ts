@@ -4,6 +4,7 @@ import type { MetadataRoute } from 'next'
 import { SURAH_METADATA } from '@/lib/surah-metadata'
 import { RECITERS_CONFIG } from '@/lib/configs'
 import { slugify } from '@/lib/metadata'
+import { encodeAlbumId } from '@/lib/entity-ids'
 
 const siteUrl = 'https://muslim.opentuwa.com'
 
@@ -19,7 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   for (const [id, reciter] of Object.entries(RECITERS_CONFIG)) {
     urls.push({
-      url: `${siteUrl}/en/reciter/${slugify(reciter.name)}/${id}`,
+      url: `${siteUrl}/us/reciter/${slugify(reciter.name)}/${id}`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
@@ -27,8 +28,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }
 
   for (const surah of SURAH_METADATA) {
+    const albumId = encodeAlbumId(surah.chapter)
     urls.push({
-      url: `${siteUrl}/en/surah/${slugify(surah.english_name)}/${surah.chapter}`,
+      url: `${siteUrl}/us/album/${slugify(surah.english_name)}/${albumId}`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,

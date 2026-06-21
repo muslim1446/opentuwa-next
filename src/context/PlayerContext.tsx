@@ -8,10 +8,12 @@ import { SURAH_METADATA } from '@/lib/surah-metadata'
 import {
   RECITERS_CONFIG, TRANSLATIONS_CONFIG, STORAGE_KEY,
   RTL_CODES, FTT_URL, ARTIST_NAME, ALBUM_NAME, HOMEPAGE_TITLE, CHAPTER_TITLE_SUFFIX,
+  TRANSLATION_AUDIO_CONFIG, DEFAULT_STOREFRONT,
 } from '@/lib/configs'
 import { encodeStream, decodeStream, loadState, saveState, getBrowserLang } from '@/lib/stream-utils'
 import { getChapterTiming } from '@/lib/timing'
 import { slugify } from '@/lib/metadata'
+import { encodeSongId, encodeAlbumId, decodeSongId } from '@/lib/entity-ids'
 
 interface FocusedSurah {
   chapterNum: number
@@ -125,51 +127,77 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
     let ch = 0
     let verseNum = 1
+    let rec = 'alafasy'
+    let trans = 'en'
+    let audTrans = 'none'
 
-    // Try Apple-style URL first: /{storefront}/surah/{slug}/{id}?i={verse}
-    const surahMatch = pathname.match(/\/[^/]+\/surah\/[^/]+\/(\d+)/)
-    if (surahMatch) {
-      ch = parseInt(surahMatch[1]) - 1
-      if (urlParams.has('i')) verseNum = parseInt(urlParams.get('i')!)
-    } else if (streamData) {
-      ch = streamData.chapter - 1
-      verseNum = streamData.verse
-    } else if (urlParams.has('chapter')) {
-      ch = parseInt(urlParams.get('chapter')!) - 1
-    } else if (saved) {
-      ch = saved.chapter
+    // Try Apple song ID from path: /{storefront}/song/{slug}/{songId}
+    const songMatch = pathname.match(/\/[^/]+\/song\/[^/]+\/(\d{11})/)
+    if (songMatch) {
+      const decoded = decodeSongId(songMatch[1])
+      if (decoded) {
+        ch = decoded.chapter - 1
+        verseNum = decoded.verse
+        rec = decoded.reciter
+        trans = decoded.trans
+        audTrans = decoded.audioTrans
+      }
     }
+
+    // Try Apple album URL: /{storefront}/album/{slug}/{albumId}?i={songId}
+    const albumMatch = pathname.match(/\/[^/]+\/album\/[^/]+\/(\d{11})/)
+    if (!songMatch && albumMatch) {
+      if (urlParams.has('i')) {
+        const decoded = decodeSongId(urlParams.get('i')!)
+        if (decoded) {
+          ch = decoded.chapter - 1
+          verseNum = decoded.verse
+          rec = decoded.reciter
+          trans = decoded.trans
+          audTrans = decoded.audioTrans
+        }
+      }
+    }
+
+    // Old stream format fallback
+    if (!songMatch && !albumMatch) {
+      if (streamData) {
+        ch = streamData.chapter - 1
+        verseNum = streamData.verse
+        rec = streamData.reciter
+        trans = streamData.trans
+        audTrans = streamData.audio_trans
+      } else if (urlParams.has('chapter')) {
+        ch = parseInt(urlParams.get('chapter')!) - 1
+      } else if (saved) {
+        ch = saved.chapter
+      }
+
+      if (!streamData) {
+        if (urlParams.has('reciter') && RECITERS_CONFIG[urlParams.get('reciter')!]) rec = urlParams.get('reciter')!
+        else if (saved?.reciter) rec = saved.reciter
+        if (urlParams.has('trans')) trans = urlParams.get('trans')!
+        else if (saved?.trans) trans = saved.trans
+        else if (TRANSLATIONS_CONFIG[browserLang]) trans = browserLang
+        if (urlParams.has('audio_trans')) audTrans = urlParams.get('audio_trans')!
+        else if (saved?.audio_trans) audTrans = saved.audio_trans
+        if (urlParams.has('verse')) verseNum = parseInt(urlParams.get('verse')!)
+        else if (saved?.verse !== undefined) verseNum = saved.verse + 1
+      }
+    }
+
+    if (!TRANSLATIONS_CONFIG[trans]) trans = 'en'
+    if (!TRANSLATIONS_CONFIG[audTrans] && audTrans !== 'none') audTrans = 'none'
+    if (!RECITERS_CONFIG[rec]) rec = 'alafasy'
+
     if (isNaN(ch) || ch < 0) ch = 0
     setCurrentChapterIdx(ch)
-
-    let rec = 'alafasy'
-    if (urlParams.has('reciter') && RECITERS_CONFIG[urlParams.get('reciter')!]) rec = urlParams.get('reciter')!
-    else if (streamData && RECITERS_CONFIG[streamData.reciter]) rec = streamData.reciter
-    else if (saved?.reciter) rec = saved.reciter
     setCurrentReciter(rec)
-
-    let trans = 'en'
-    if (urlParams.has('trans')) trans = urlParams.get('trans')!
-    else if (streamData) trans = streamData.trans
-    else if (saved?.trans) trans = saved.trans
-    else if (TRANSLATIONS_CONFIG[browserLang]) trans = browserLang
-    if (!TRANSLATIONS_CONFIG[trans]) trans = 'en'
     setCurrentTrans(trans)
-
-    let audTrans = 'none'
-    if (urlParams.has('audio_trans')) audTrans = urlParams.get('audio_trans')!
-    else if (streamData) audTrans = streamData.audio_trans
-    else if (saved?.audio_trans) audTrans = saved.audio_trans
-    if (!TRANSLATIONS_CONFIG[audTrans] && audTrans !== 'none') audTrans = 'none'
     setCurrentAudioTrans(audTrans)
-
-    if (urlParams.has('i')) verseNum = parseInt(urlParams.get('i')!)
-    else if (streamData) verseNum = streamData.verse
-    else if (urlParams.has('verse')) verseNum = parseInt(urlParams.get('verse')!)
-    else if (saved?.verse !== undefined) verseNum = saved.verse + 1
     setCurrentVerseIdx(verseNum - 1)
 
-    if (surahMatch || urlParams.has('stream') || urlParams.has('chapter')) {
+    if (songMatch || albumMatch || urlParams.has('stream') || urlParams.has('chapter')) {
       setView('cinema')
     }
   }
@@ -250,16 +278,16 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     if (!ch) return
     const chNum = ch.chapterNumber
     const vNum = ch.verses[vIdx]?.verseNumber || 1
-    const storefront = 'en'
-    const surahSlug = slugify(ch.english_name)
-    const qs = new URLSearchParams()
-    qs.set('i', String(vNum))
-    qs.set('reciter', reciter)
-    qs.set('trans', trans)
-    if (audioTrans !== 'none') qs.set('audio_trans', audioTrans)
-    const newUrl = `/${storefront}/surah/${surahSlug}/${chNum}?${qs.toString()}`
-    if (typeof window !== 'undefined') window.history.replaceState({ path: newUrl, view: 'cinema' }, '', newUrl)
-  }, [currentChapterIdx, currentVerseIdx, quranData])
+    const storefront = DEFAULT_STOREFRONT || 'us'
+    const slug = slugify(ch.english_name)
+    const albumId = encodeAlbumId(chNum)
+    const songId = encodeSongId(chNum, vNum, reciter, trans, audioTrans)
+    const isCinema = view === 'cinema'
+    const newUrl = isCinema
+      ? `/${storefront}/song/${slug}/${songId}`
+      : `/${storefront}/album/${slug}/${albumId}?i=${songId}`
+    if (typeof window !== 'undefined') window.history.replaceState({ path: newUrl, view: isCinema ? 'cinema' : 'dashboard' }, '', newUrl)
+  }, [currentChapterIdx, currentVerseIdx, quranData, view])
 
   const updateMediaSession = useCallback((surah: string, verse: number) => {
     if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return
@@ -415,14 +443,16 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       setCurrentVerseIdx(verseNum - 1)
       setView('cinema')
       const ch = quranData[chapterNum - 1]
-      const storefront = 'en'
-      const surahSlug = ch ? slugify(ch.english_name) : `surah-${chapterNum}`
-      const qs = new URLSearchParams()
-      qs.set('i', String(verseNum))
-      qs.set('reciter', currentReciterRef.current)
-      qs.set('trans', currentTransRef.current)
-      if (currentAudioTransRef.current !== 'none') qs.set('audio_trans', currentAudioTransRef.current)
-      const newUrl = `/${storefront}/surah/${surahSlug}/${chapterNum}?${qs.toString()}`
+      const storefront = DEFAULT_STOREFRONT || 'us'
+      const slug = ch ? slugify(ch.english_name) : `chapter-${chapterNum}`
+      const albumId = encodeAlbumId(chapterNum)
+      const songId = encodeSongId(
+        chapterNum, verseNum,
+        currentReciterRef.current,
+        currentTransRef.current,
+        currentAudioTransRef.current,
+      )
+      const newUrl = `/${storefront}/song/${slug}/${songId}`
       if (typeof window !== 'undefined') window.history.pushState({ view: 'cinema', path: newUrl }, '', newUrl)
       setTimeout(() => { if (fade) fade.classList.remove('active') }, 300)
     }, 200)
