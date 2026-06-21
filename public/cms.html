@@ -624,42 +624,35 @@ async function saveTrack() {
 
 /* ─── SEED ALAFASY ─── */
 async function seedAlafasyData() {
-  if (!confirm('This will seed the entire The Holy Quran by Mishary Rashid Alafasy dataset (114 albums, ~6200 tracks). Continue?')) return;
+  if (!confirm('Seed 1 artist, 1 album (Al-Mushaf Al-Murattal), and 114 surah tracks. Continue?')) return;
   const btn = document.getElementById('btn-seed');
   btn.disabled = true; btn.textContent = '⏳ Seeding…';
   try {
-    // Artist
-    await d1Query(`INSERT OR REPLACE INTO artists (id,name,slug,bio,artwork_url,genre,created_at,updated_at) VALUES ('alafasy','Mishari Rashid Alafasy','mishary-rashid-alafasy','Kuwaiti qari and imam.','https://opentuwa.com/assets/ui/web_1200.png','Quran, Recitation',datetime('now'),datetime('now'))`);
-    toast('Artist created, importing albums…','info');
+    await d1Query(`INSERT OR REPLACE INTO artists (id,name,slug,bio,artwork_url,genre,created_at,updated_at) VALUES ('alafasy','Mishari Rashid Alafasy','mishary-rashid-alafasy','Kuwaiti qari and imam. Completed his first complete Quranic recitation in 1424H (2003).','https://opentuwa.com/assets/ui/web_1200.png','Quran, Recitation',datetime('now'),datetime('now'))`);
+    
+    const albumId = 'alafasy-001';
+    await d1Query('INSERT OR REPLACE INTO albums (id,artist_id,title,slug,description,artwork_url,genre,track_count,is_verse_based,has_timing,timing_base_url,audio_base_url,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,datetime(\'now\'),datetime(\'now\'))',
+      [albumId,'alafasy','Al-Mushaf Al-Murattal — Khatma 1424-2003','al-mushaf-al-murattal-khatma-1424-2003','The complete studio recording of the Holy Quran recited by Sheikh Mishari Rashid Alafasy, completed during the Hijri year 1424 (2003 AD). This historically marks his very first complete Quranic recitation compilation.','https://opentuwa.com/assets/ui/web_1200.png','Quran, Recitation',114,0,1,'https://raw.githubusercontent.com/muslim1446/CDN-muslim.opentuwa.com/main','https://hosting.opentuwa.com']);
+    
+    toast('Artist + album created, importing 114 surah tracks…','info');
     
     const SURAH_NAMES = [
       'The Opening','The Cow','The Family of Imran','The Women','The Table Spread','The Cattle','The Heights','The Spoils of War','The Repentance','Jonah','Hud','Joseph','The Thunder','Abraham','The Rocky Tract','The Bee','The Night Journey','The Cave','Mary','Ta-Ha','The Prophets','The Pilgrimage','The Believers','The Light','The Criterion','The Poets','The Ant','The Narratives','The Spider','The Romans','Luqman','The Prostration','The Combined Forces','Sheba','The Originator','O Man','Those Who Set The Ranks','The Letter Sad','The Troops','The Forgiver','Explained in Detail','The Consultation','The Ornaments of Gold','The Smoke','The Crouching','The Wind-Curved Sandhills','Muhammad','The Victory','The Rooms','The Letter Qaf','The Winnowing Winds','The Mount','The Star','The Moon','The Beneficent','The Inevitable','The Iron','The Pleading Woman','The Exile','She That Is To Be Examined','The Ranks','The Congregation','The Hypocrites','The Mutual Disillusion','The Divorce','The Prohibition','The Sovereignty','The Pen','The Reality','The Ascending Stairways','Noah','The Jinn','The Enshrouded One','The Cloaked One','The Resurrection','Man','The Emissaries','The Tidings','Those Who Drag Forth','He Frowned','The Overthrowing','The Cleaving','The Defrauding','The Sundering','The Mansions of the Stars','The Morning Star','The Most High','The Overwhelming','The Dawn','The City','The Sun','The Night','The Morning Hours','The Relief','The Fig','The Clot','The Power','The Clear Proof','The Earthquake','The Courser','The Calamity','The Rivalry in World Increase','The Declining Day','The Traducer','The Elephant','Quraysh','The Small Kindnesses','The Abundance','The Disbelievers','The Divine Support','The Palm Fiber','The Sincerity','The Daybreak','Mankind'
     ];
-    const VERSE_COUNTS = [7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,110,98,135,112,78,118,64,77,227,93,88,69,60,34,30,73,54,45,83,182,88,75,85,54,53,89,59,37,35,38,29,18,45,60,49,62,55,78,96,29,22,24,13,14,11,11,18,12,12,30,52,52,44,28,28,20,56,40,31,50,40,46,42,29,19,36,25,22,17,19,26,30,20,15,21,11,8,8,19,5,8,8,11,11,8,3,9,5,4,7,3,6,3,5,4,5,6];
     const AUDIO_BASE = 'https://hosting.opentuwa.com';
     const TIMING_BASE = 'https://raw.githubusercontent.com/muslim1446/CDN-muslim.opentuwa.com/main';
-
-    for (let i = 0; i < SURAH_NAMES.length; i++) {
-      const ch = i + 1;
-      const name = SURAH_NAMES[i];
-      const vc = VERSE_COUNTS[i];
+    
+    for (let ch = 1; ch <= 114; ch++) {
+      const name = SURAH_NAMES[ch - 1];
+      const paddedCh = String(ch).padStart(3,'0');
+      const trackId = paddedCh + '00100000';
       const slug = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-      const albumId = String(ch).padStart(3,'0') + '00000000';
-      const desc = `${name} (${vc} verses)`;
-
-      await d1Query('INSERT OR REPLACE INTO albums (id,artist_id,title,slug,description,artwork_url,genre,track_count,is_verse_based,has_timing,timing_base_url,audio_base_url,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,datetime(\'now\'),datetime(\'now\'))',
-        [albumId,'alafasy',name,slug,desc,'https://opentuwa.com/assets/ui/web_1200.png','Quran, Recitation',vc,1,1,TIMING_BASE,AUDIO_BASE]);
-
-      for (let v = 1; v <= vc; v++) {
-        const trackId = String(ch).padStart(3,'0') + String(v).padStart(3,'0') + '00000';
-        const paddedCh = String(ch).padStart(3,'0');
-        const trackSlug = `verse-${v}`;
-        await d1Query('INSERT OR REPLACE INTO tracks (id,album_id,artist_id,title,slug,track_number,disc_number,duration_ms,audio_url,timing_json_url,has_timing,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,datetime(\'now\'),datetime(\'now\'))',
-          [trackId,albumId,'alafasy',`${name} — Verse ${v}`,trackSlug,v,1,8000,`${AUDIO_BASE}/${paddedCh}.wav`,`${TIMING_BASE}/${paddedCh}.json`,1]);
-      }
-      if (i % 10 === 0) toast(`Album ${ch}/114: ${name}`,'info');
+      
+      await d1Query('INSERT OR REPLACE INTO tracks (id,album_id,artist_id,title,slug,track_number,disc_number,duration_ms,audio_url,timing_json_url,has_timing,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,datetime(\'now\'),datetime(\'now\'))',
+        [trackId,albumId,'alafasy',name,slug,ch,1,8000,`${AUDIO_BASE}/${paddedCh}.wav`,`${TIMING_BASE}/${paddedCh}.json`,1]);
+      if (ch % 10 === 0) toast(`Track ${ch}/114: ${name}`,'info');
     }
-    toast('✅ Seed complete! 1 artist, 114 albums, all tracks','success',5000);
+    toast('✅ Seed complete! 1 artist, 1 album, 114 tracks','success',5000);
     await loadData();
   } catch(e) {
     toast('Seed error: ' + e.message, 'error', 8000);
