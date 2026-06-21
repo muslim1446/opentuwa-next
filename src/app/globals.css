@@ -1279,6 +1279,13 @@ select:focus, select:hover {
         opacity: 1 !important;
         visibility: visible !important;
         pointer-events: auto !important;
+        position: relative !important;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        width: auto !important;
         min-width: 160px;
         max-width: calc(100vw - 24px);
         border-radius: 16px;
