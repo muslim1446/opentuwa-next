@@ -1212,6 +1212,36 @@ select:focus, select:hover {
     .hero-title-text { text-align: left; margin-left: 0; }
 }
 
+/* --- Desktop: flip popovers downward --- */
+@media screen and (min-width: 821px) {
+  .volume-popover {
+    bottom: auto;
+    top: calc(100% + 12px);
+  }
+  .volume-popover::after {
+    top: auto;
+    bottom: 100%;
+    border-top-color: transparent;
+    border-bottom-color: rgba(30, 30, 30, 0.95);
+  }
+
+  .eq-popover {
+    bottom: auto;
+    top: calc(100% + 12px);
+  }
+  .eq-popover::after {
+    top: auto;
+    bottom: 100%;
+    border-top-color: transparent;
+    border-bottom-color: rgba(30, 30, 30, 0.95);
+  }
+
+  #player-island #translationSelectWrapper .custom-options {
+    bottom: auto;
+    top: calc(100% + 12px);
+  }
+}
+
 @media screen and (max-width: 480px) {
     .island-transport-btn.shuffle-btn,
     .island-transport-btn.loop-btn {
