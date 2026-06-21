@@ -143,7 +143,7 @@ button.btn-icon { padding: 0.28rem 0.38rem; }
   </div>
   <div class="nav-actions">
     <button class="btn-outline" onclick="loadData()">↻ Refresh</button>
-    <button class="btn-outline" onclick="showTokenModal()">🔑 Token</button>
+
     <button class="btn-primary" id="btn-seed" onclick="seedAlafasyData()">🌱 Seed Alafasy</button>
   </div>
 </nav>
@@ -294,22 +294,6 @@ button.btn-icon { padding: 0.28rem 0.38rem; }
   </div>
 </main>
 
-<div class="modal-overlay" id="token-modal">
-  <div class="modal-content">
-    <h2>API Token</h2>
-    <div class="form-group">
-      <label>CMS API Token</label>
-      <input type="password" id="cms-token-input" placeholder="Enter your CMS_API_TOKEN" />
-      <span style="font-size:0.65rem;color:var(--text-muted);margin-top:4px;">
-        Set via <code>CMS_API_TOKEN</code> env var. Default: <code>opentuwa-cms-token</code>
-      </span>
-    </div>
-    <div style="display:flex;gap:0.4rem;justify-content:flex-end;margin-top:1rem;">
-      <button class="btn-outline" onclick="closeModal('token-modal')">Cancel</button>
-      <button class="btn-primary" onclick="saveToken()">Save Token</button>
-    </div>
-  </div>
-</div>
 
 <div class="modal-overlay" id="delete-modal">
   <div class="modal-content" style="max-width:400px;">
@@ -331,19 +315,6 @@ let editingArtistId = null, editingAlbumId = null, editingTrackId = null;
 let pendingDelete = null;
 const API = '/api/d1';
 
-function getToken() { return localStorage.getItem('cms_token') || 'opentuwa-cms-token'; }
-function saveToken() {
-  const t = document.getElementById('cms-token-input').value.trim();
-  if (t) localStorage.setItem('cms_token', t);
-  closeModal('token-modal');
-  toast('Token saved','success');
-  loadData();
-}
-function showTokenModal() {
-  document.getElementById('cms-token-input').value = getToken();
-  document.getElementById('token-modal').classList.add('active');
-}
-
 /* ─── TOAST ─── */
 function toast(msg, type = 'success', duration = 3200) {
   const el = document.createElement('div');
@@ -356,17 +327,13 @@ function toast(msg, type = 'success', duration = 3200) {
 
 /* ─── API CALL ─── */
 async function d1Query(sql, params = []) {
-  const token = getToken();
   const res = await fetch(API, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ sql, params })
   });
   const data = await res.json();
-  if (!res.ok || data.error) {
-    if (data.error === 'Unauthorized') showTokenModal();
-    throw new Error(data.error || `HTTP ${res.status}`);
-  }
+  if (!res.ok || data.error) throw new Error(data.error || `HTTP ${res.status}`);
   return data.results || data.result;
 }
 
