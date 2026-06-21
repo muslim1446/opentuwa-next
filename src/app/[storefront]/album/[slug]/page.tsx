@@ -102,12 +102,11 @@ export default async function AlbumPage({
 
   return (
     <>
-      <style>{`.album-track-link:hover { background: rgba(255,255,255,0.05); }`}</style>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="max-w-3xl mx-auto p-6" style={{ paddingTop: '1.5rem' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto', paddingTop: '1.5rem' }}>
         <Breadcrumb
           items={[
             { name: 'Home', href: `${siteUrl}/${storefront}` },
@@ -137,6 +136,7 @@ export default async function AlbumPage({
             const displayId = String(track.track_number)
             const qs = album.is_verse_based && track.id ? `?t=${track.id}` : ''
             const href = `/${storefront}/song/${trackSlug}/${displayId}${qs}`
+            const dur = track.duration_ms ? `${Math.floor(track.duration_ms / 60000)}:${(track.duration_ms % 60000 / 1000).toFixed(0).padStart(2, '0')}` : null
             return (
               <Link
                 key={track.id}
@@ -151,20 +151,17 @@ export default async function AlbumPage({
                   color: 'rgba(255,255,255,0.8)',
                   fontSize: 14,
                 }}
-                className="album-track-link"
+                className="album-track-row"
               >
                 <span style={{ width: 24, textAlign: 'right', color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>{track.track_number}</span>
                 <span style={{ flexGrow: 1 }}>{track.title}</span>
-                {track.duration_ms ? (
-                  <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>
-                    {Math.floor(track.duration_ms / 60000)}:{(track.duration_ms % 60000 / 1000).toFixed(0).padStart(2, '0')}
-                  </span>
-                ) : null}
+                {dur && <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>{dur}</span>}
               </Link>
             )
           })}
         </div>
       </div>
+      <style>{`.album-track-row:hover{background:rgba(255,255,255,0.05)}`}</style>
     </>
   )
 }
