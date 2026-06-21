@@ -126,22 +126,26 @@ export function EQPopup() {
     saveGains({})
   }, [])
 
-  const handleMouseEnter = () => {
+  const handleMouseEnterArea = () => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
   }
 
-  const handleMouseLeave = () => {
+  const handleMouseLeaveArea = () => {
     closeTimerRef.current = setTimeout(() => setIsOpen(false), 500)
+  }
+
+  const handlePopoverEnter = () => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
   }
 
   return (
     <div
       ref={wrapRef}
       className={`eq-wrap ${isOpen ? 'eq-open' : ''}`}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseEnter={handleMouseEnterArea}
+      onMouseLeave={handleMouseLeaveArea}
     >
-      <div className="eq-popover">
+      <div className="eq-popover" onMouseEnter={handlePopoverEnter}>
         <div className="eq-popover-header">
           <span className="eq-popover-title">Equalizer</span>
           <button className="eq-popover-reset" onClick={handleReset}>Reset</button>
