@@ -4,22 +4,55 @@ import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { SURAH_METADATA } from '@/lib/surah-metadata'
 import { RECITERS_CONFIG, ARTIST_NAME, PLATFORM_NAME, DEFAULT_STOREFRONT } from '@/lib/configs'
-import { buildAlbumMetadata, slugify } from '@/lib/metadata'
+import { buildAlbumMetadata, buildSongMetadata, slugify } from '@/lib/metadata'
 import { albumJsonLd, toISO8601Duration } from '@/lib/json-ld'
 import { Breadcrumb } from '@/components/Breadcrumb'
-import { decodeAlbumId, decodeSongId, encodeAlbumId } from '@/lib/entity-ids'
+import { decodeAlbumId, decodeSongId, encodeAlbumId, encodeSongId } from '@/lib/entity-ids'
 import HomeClient from '@/app/home-client'
 
 const siteUrl = 'https://muslim.opentuwa.com'
 
 export const revalidate = 86400
 
-export async function generateMetadata({ params }: { params: Promise<{ storefront: string; slug: string; id: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ storefront: string; slug: string; id: string }>
+  searchParams: Promise<{ i?: string }>
+}): Promise<Metadata> {
   const { storefront, id } = await params
+  const { i: songId } = await searchParams
+
   const decoded = decodeAlbumId(id)
   if (!decoded) return {}
   const ch = SURAH_METADATA.find(s => s.chapter === decoded.chapter)
   if (!ch) return {}
+
+  // When ?i= is present (deep-link to a specific track), canonical points to the song page
+  // and we set noindex to avoid duplicate-content dilution (see guide §1)
+  if (songId) {
+    const songDecoded = decodeSongId(songId)
+    if (songDecoded) {
+      const songSlug = slugify(ch.english_name)
+      const meta = buildSongMetadata({
+        name: ch.english_name,
+        artistName: ARTIST_NAME,
+        artistSlug: slugify(ARTIST_NAME),
+        artistId: 'alafasy',
+        albumName: ch.english_name,
+        albumSlug: songSlug,
+        albumId: id,
+        slug: songSlug,
+        id: songId,
+        storefront,
+        artworkUrl: 'https://opentuwa.com/assets/ui/web_1200.png',
+        durationSeconds: 8,
+        trackNumber: songDecoded.verse,
+      })
+      return { ...meta, robots: { index: false, follow: true } }
+    }
+  }
 
   const verseCountMatch = ch.description?.match(/\((\d+) verses?\)/)
   const trackCount = verseCountMatch ? parseInt(verseCountMatch[1]) : 0

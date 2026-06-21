@@ -62,18 +62,30 @@ export function buildSongMetadata(song: {
   artworkUrl: string
   durationSeconds: number
   previewUrl?: string
+  trackNumber?: number
 }): Metadata {
   const url = `${SITE}/${song.storefront}/song/${song.slug}/${song.id}`
-  const title = `${song.artistName} — ${song.name} on ${SITE_NAME}`
+  const title = `${song.name} — Song by ${song.artistName} on ${SITE_NAME}`
   const description = `Listen to ${song.name} by ${song.artistName} on ${SITE_NAME}.`
   const artistUrl = `${SITE}/${song.storefront}/reciter/${song.artistSlug}/${song.artistId}`
   const albumUrl = `${SITE}/${song.storefront}/album/${song.albumSlug}/${song.albumId}`
+
+  const other: Record<string, string> = {}
+  if (song.previewUrl) {
+    other['og:audio'] = song.previewUrl
+    other['og:audio:type'] = 'audio/mp4'
+  }
+  if (song.trackNumber) {
+    other['music:album:track'] = String(song.trackNumber)
+    other['music:album:disc'] = '1'
+  }
 
   return {
     title,
     description,
     alternates: {
       canonical: url,
+      languages: buildHreflangMap('song', song.slug, song.id),
     },
     openGraph: {
       type: 'music.song',
@@ -91,10 +103,7 @@ export function buildSongMetadata(song: {
       description,
       images: [song.artworkUrl],
     },
-    other: song.previewUrl ? {
-      'og:audio': song.previewUrl,
-      'og:audio:type': 'audio/mp4',
-    } : {},
+    other,
     robots: { index: true, follow: true },
   }
 }
@@ -118,6 +127,7 @@ export function buildArtistMetadata(artist: {
     description,
     alternates: {
       canonical: url,
+      languages: buildHreflangMap('reciter', artist.slug, artist.id),
     },
     openGraph: {
       type: 'profile',

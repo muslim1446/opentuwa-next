@@ -6,20 +6,14 @@ import { RECITERS_CONFIG, PLATFORM_NAME } from '@/lib/configs'
 import { slugify } from '@/lib/metadata'
 import { encodeAlbumId } from '@/lib/entity-ids'
 import { Breadcrumb } from '@/components/Breadcrumb'
-import { siteSearchJsonLd } from '@/lib/json-ld'
 
 const siteUrl = 'https://muslim.opentuwa.com'
 
 export default async function StorefrontHome({ params }: { params: Promise<{ storefront: string }> }) {
   const { storefront } = await params
-  const siteSearch = siteSearchJsonLd()
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(siteSearch) }}
-      />
       <Breadcrumb items={[{ name: 'Home', href: `${siteUrl}/${storefront}` }]} />
 
       <div style={{ padding: '24px 16px', maxWidth: 1200, margin: '0 auto' }}>

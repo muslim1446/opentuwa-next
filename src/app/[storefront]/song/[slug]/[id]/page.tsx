@@ -35,6 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ storefron
     artworkUrl: 'https://opentuwa.com/assets/ui/web_1200.png',
     durationSeconds: 8,
     previewUrl: `https://hosting.opentuwa.com/${String(decoded.chapter).padStart(3, '0')}.wav`,
+    trackNumber: decoded.verse,
   })
 }
 

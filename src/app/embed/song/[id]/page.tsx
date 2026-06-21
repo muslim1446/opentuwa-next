@@ -12,21 +12,22 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const decoded = decodeSongId(id)
   const chNum = decoded?.chapter || 1
   const ch = SURAH_METADATA.find(s => s.chapter === chNum)
-  const title = ch ? `${ARTIST_NAME} — ${ch.english_name}` : `${PLATFORM_NAME} Audio`
+  const songName = ch ? ch.english_name : `Track ${chNum}`
+  const desc = `${ARTIST_NAME} on ${PLATFORM_NAME}`
 
   return {
-    title,
-    description: ch?.description || 'Audio playback',
+    title: songName,
+    description: desc,
     openGraph: {
-      title,
-      description: ch?.description,
+      title: songName,
+      description: desc,
       siteName: PLATFORM_NAME,
       images: [{ url: 'https://opentuwa.com/assets/ui/web_1200.png', width: 1200, height: 1200 }],
     },
     twitter: {
       card: 'player',
-      title,
-      description: ch?.description || 'Audio playback',
+      title: songName,
+      description: desc,
       images: ['https://opentuwa.com/assets/ui/web_1200.png'],
       players: {
         playerUrl: `${siteUrl}/embed/song/${id}`,

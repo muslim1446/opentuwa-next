@@ -32,6 +32,21 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: platform,
+    startupImage: [`${siteUrl}/assets/ui/web_1200.png`],
+  },
+  icons: {
+    icon: [
+      { url: 'https://opentuwa.com/assets/ui/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
+      { url: 'https://opentuwa.com/assets/ui/favicon.svg', type: 'image/svg+xml' },
+      { url: 'https://opentuwa.com/assets/ui/favicon.ico' },
+    ],
+    shortcut: { url: 'https://opentuwa.com/assets/ui/favicon.ico' },
+    apple: [
+      { url: 'https://opentuwa.com/assets/ui/apple-touch-icon.png', sizes: '180x180' },
+      { url: 'https://opentuwa.com/assets/ui/apple-touch-icon.png', sizes: '152x152' },
+      { url: 'https://opentuwa.com/assets/ui/apple-touch-icon.png', sizes: '120x120' },
+    ],
+    other: { rel: 'mask-icon', url: 'https://opentuwa.com/assets/ui/favicon.svg' },
   },
   openGraph: {
     type: 'website',
