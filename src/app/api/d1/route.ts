@@ -2,15 +2,14 @@ export const runtime = 'edge'
 
 import { getRequestContext } from '@cloudflare/next-on-pages'
 
-const API_TOKEN = process.env.CMS_API_TOKEN || 'opentuwa-cms-token'
-
 export async function POST(request: Request) {
+  const ctx = getRequestContext()
+  const token = (ctx.env as any).CMS_API_TOKEN || process.env.CMS_API_TOKEN || 'opentuwa-cms-token'
   const auth = request.headers.get('authorization')
-  if (auth !== `Bearer ${API_TOKEN}`) {
+  if (auth !== `Bearer ${token}`) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const ctx = getRequestContext()
   const db = ctx.env.DB as D1Database
 
   let body: { sql: string; params?: unknown[] }
