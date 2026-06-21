@@ -4,10 +4,10 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { SURAH_METADATA } from '@/lib/surah-metadata'
-import { ARTIST_NAME, ALBUM_NAME } from '@/lib/configs'
+import { ARTIST_NAME } from '@/lib/configs'
 import { buildAlbumMetadata, slugify } from '@/lib/metadata'
 import { encodeAlbumId } from '@/lib/entity-ids'
-import { albumJsonLd, toISO8601Duration } from '@/lib/json-ld'
+import { GraphSchema } from '@/components/GraphSchema'
 import { Breadcrumb } from '@/components/Breadcrumb'
 import { ChapterClient } from './chapter-client'
 
@@ -50,26 +50,11 @@ export default async function ChapterPage({ params }: { params: Promise<{ id: st
   const verseCountMatch = ch.description?.match(/\((\d+) verses?\)/)
   const verseCount = verseCountMatch ? parseInt(verseCountMatch[1]) : 0
 
-  const tracks = Array.from({ length: verseCount }, (_, i) => ({
-    name: `Track ${i + 1}`,
-    durationISO8601: toISO8601Duration(8),
-    position: i + 1,
-  }))
-
-  const jsonLd = albumJsonLd({
-    name: ch.english_name,
-    url: surahUrl,
-    image: 'https://opentuwa.com/assets/ui/web_1200.png',
-    datePublished: '',
-    artist: { name: ARTIST_NAME, url: reciterUrl },
-    tracks,
-  })
-
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      <GraphSchema
+        type="chapter"
+        data={{ chapter: ch, verseCount, url: surahUrl, reciterUrl }}
       />
       <Breadcrumb
         items={[

@@ -5,8 +5,9 @@ import { notFound, redirect } from 'next/navigation'
 import { SURAH_METADATA } from '@/lib/surah-metadata'
 import { ARTIST_NAME, PLATFORM_NAME } from '@/lib/configs'
 import { buildSongMetadata, slugify } from '@/lib/metadata'
-import { songJsonLd, toISO8601Duration } from '@/lib/json-ld'
+import { toISO8601Duration } from '@/lib/json-ld'
 import { Breadcrumb } from '@/components/Breadcrumb'
+import { GraphSchema } from '@/components/GraphSchema'
 import { decodeSongId, encodeAlbumId } from '@/lib/entity-ids'
 import HomeClient from '@/app/home-client'
 
@@ -61,20 +62,20 @@ export default async function SongPage({
   const reciterUrl = `${siteUrl}/${storefront}/reciter/${slugify(ARTIST_NAME)}/alafasy`
   const albumUrl = `${siteUrl}/${storefront}/album/${correctSlug}/${albumId}`
 
-  const jsonLd = songJsonLd({
-    name: ch.english_name,
-    url,
-    image: 'https://opentuwa.com/assets/ui/web_1200.png',
-    durationISO8601: toISO8601Duration(8),
-    artist: { name: ARTIST_NAME, url: reciterUrl },
-    album: { name: ch.english_name, url: albumUrl },
-  })
-
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      <GraphSchema
+        type="song"
+        data={{
+          chapter: ch,
+          url,
+          reciterUrl,
+          albumUrl,
+          albumChapterUrl: albumUrl,
+          verseNum: decoded.verse,
+          durationISO: toISO8601Duration(8),
+        }}
+        storefront={storefront}
       />
       <Breadcrumb
         items={[

@@ -6,8 +6,8 @@ import { RECITERS_CONFIG } from '@/lib/configs'
 import { SURAH_METADATA } from '@/lib/surah-metadata'
 import { buildArtistMetadata, slugify } from '@/lib/metadata'
 import { encodeAlbumId } from '@/lib/entity-ids'
-import { artistJsonLd } from '@/lib/json-ld'
 import { Breadcrumb } from '@/components/Breadcrumb'
+import { GraphSchema } from '@/components/GraphSchema'
 import Link from 'next/link'
 
 const siteUrl = 'https://muslim.opentuwa.com'
@@ -37,19 +37,12 @@ export default async function ReciterPage({ params }: { params: Promise<{ storef
 
   const url = `${siteUrl}/${storefront}/reciter/${slugify(reciter.name)}/${id}`
 
-  const jsonLd = artistJsonLd({
-    name: reciter.name,
-    url,
-    image: 'https://opentuwa.com/assets/ui/web_1200.png',
-    genres: ['Quran', 'Recitation'],
-    sameAs: ['https://www.youtube.com/@MisharyAlafasy'],
-  })
-
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      <GraphSchema
+        type="reciter"
+        data={{ reciter, url }}
+        storefront={storefront}
       />
       <Breadcrumb
         items={[

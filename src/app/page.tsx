@@ -1,9 +1,7 @@
 import type { Metadata } from 'next'
-import { SURAH_METADATA } from '@/lib/surah-metadata'
-import { ARTIST_NAME, ALBUM_NAME, PLATFORM_NAME, SITE_URL } from '@/lib/configs'
-import { encodeAlbumId } from '@/lib/entity-ids'
-import { slugify } from '@/lib/metadata'
+import { PLATFORM_NAME, SITE_URL } from '@/lib/configs'
 import { cookies } from 'next/headers'
+import { GraphSchema } from '@/components/GraphSchema'
 import HomeClient from './home-client'
 
 export const runtime = 'edge'
@@ -52,58 +50,9 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   await cookies()
 
-  const itemListJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: `${ALBUM_NAME} by ${ARTIST_NAME}`,
-    description: 'Complete collection of 114 chapters.',
-    numberOfItems: 114,
-    url: siteUrl,
-    itemListElement: SURAH_METADATA.map((s, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      item: {
-        '@type': 'MusicRecording',
-        name: s.english_name,
-        description: s.description,
-        url: `${siteUrl}/us/album/${slugify(s.english_name)}/${encodeAlbumId(s.chapter)}`,
-        position: s.chapter,
-        byArtist: {
-          '@type': 'MusicGroup',
-          name: ARTIST_NAME,
-        },
-        inAlbum: {
-          '@type': 'MusicAlbum',
-          name: ALBUM_NAME,
-          numTracks: 114,
-        },
-      },
-    })),
-  }
-
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: siteUrl,
-      },
-    ],
-  }
-
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+      <GraphSchema type="homepage" />
       <HomeClient />
     </>
   )
