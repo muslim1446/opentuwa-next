@@ -1,6 +1,6 @@
 # Apple Music Web Architecture → Next.js Implementation Guide
 
-**Purpose:** This document maps the technical patterns Apple Music's web app (`music.apple.com`) is built on — URL/directory structure, SEO metadata, Open Graph, JSON-LD structured data, breadcrumbs, sitemap/robots — into concrete Next.js (App Router) code, so you can apply the same architecture to a music/audio platform of your own (e.g. Tuwa/OpenTuwa).
+**Purpose:** This document maps the technical patterns Apple Music's web app (`music.apple.com`) is built on — URL/directory structure, SEO metadata, Open Graph, JSON-LD structured data, breadcrumbs, sitemap/robots — into concrete Next.js (App Router) code, so you can apply the same architecture to a music/audio platform of your own.
 
 > \*\*A note on sourcing, read this first:\*\* Web search/fetch tooling was unavailable while building this doc (timing out on every query, including trivial ones — a tool-side outage, not a content restriction), so none of the snippets below are scraped verbatim from a live `music.apple.com` page. Everything here is built from three things I'm highly confident about because they're public, stable, documented specs rather than scraped guesses:
 > 1. The \*\*Open Graph music object spec\*\* (ogp.me) — official, hasn't changed in years.
@@ -24,7 +24,6 @@
 9. [Entity Field Reference (Song / Album / Artist / Playlist)](#9-entity-field-reference)
 10. [Images: Apple's Artwork URL Template Pattern](#10-images-apples-artwork-url-template-pattern)
 11. [Rendering Strategy: ISR vs SSR vs Static](#11-rendering-strategy-isr-vs-ssr-vs-static)
-12. [Applying This to a Quran Audio Platform (Reciter/Surah model)](#12-applying-this-to-a-quran-audio-platform)
 
 \---
 
@@ -119,8 +118,8 @@ Apple Music (and music platforms generally) construct titles compositionally rat
 // lib/metadata.ts
 import type { Metadata } from 'next';
 
-const SITE = 'https://opentuwa.com';
-const SITE\_NAME = 'OpenTuwa';
+const SITE = 'https://openXXX.com';
+const SITE\_NAME = 'OpenXXX';
 
 export function buildAlbumMetadata(album: {
   name: string;
@@ -200,17 +199,17 @@ export default async function AlbumPage({ params, searchParams }: {
 ```tsx
 // app/layout.tsx (or per-page metadata)
 export const metadata: Metadata = {
-  metadataBase: new URL('https://opentuwa.com'),
+  metadataBase: new URL('https://openXXX.com'),
   viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
   themeColor: '#000000',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'OpenTuwa',
+    title: 'OpenXXX',
   },
   // Apple's "Smart App Banner" — prompts iOS Safari users to open your native app
   other: {
-    'apple-itunes-app': 'app-id=YOUR\_APP\_ID, app-argument=https://opentuwa.com/current/path',
+    'apple-itunes-app': 'app-id=YOUR\_APP\_ID, app-argument=https://openXXX.com/current/path',
   },
   icons: {
     icon: '/favicon.ico',
@@ -273,7 +272,7 @@ If you want a Twitter/X **inline audio player card** (not just an image), that's
 ```tsx
 other: {
   'twitter:card': 'player',
-  'twitter:player': `https://opentuwa.com/embed/song/${song.id}`,
+  'twitter:player': `https://openXXX.com/embed/song/${song.id}`,
   'twitter:player:width': '480',
   'twitter:player:height': '180',
   'twitter:player:stream': song.previewUrl,
@@ -370,10 +369,10 @@ export function siteSearchJsonLd(): JsonLd {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    url: 'https://opentuwa.com',
+    url: 'https://openXXX.com',
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://opentuwa.com/search?term={search\_term\_string}',
+      target: 'https://openXXX.com/search?term={search\_term\_string}',
       'query-input': 'required name=search\_term\_string',
     },
   };
@@ -465,7 +464,7 @@ export function Breadcrumb({ items }: { items: Crumb\[] }) {
 />
 ```
 
-Two rules worth keeping: (1) `aria-current="page"` on the last crumb only, never a link to itself; (2) the JSON-LD `item` URLs should be absolute, not relative — `https://opentuwa.com/...`, not `/...`.
+Two rules worth keeping: (1) `aria-current="page"` on the last crumb only, never a link to itself; (2) the JSON-LD `item` URLs should be absolute, not relative — `https://openXXX.com/...`, not `/...`.
 
 \---
 
@@ -489,7 +488,7 @@ export async function generateSitemaps() {
 export default async function sitemap({ id }: { id: number }): Promise<MetadataRoute.Sitemap> {
   const artists = await getArtistsPage({ offset: id \* PER\_SITEMAP, limit: PER\_SITEMAP });
   return artists.map((a) => ({
-    url: `https://opentuwa.com/artist/${a.slug}/${a.id}`,
+    url: `https://openXXX.com/artist/${a.slug}/${a.id}`,
     lastModified: a.updatedAt,
     changeFrequency: 'weekly',
     priority: 0.8,
@@ -516,8 +515,8 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: 'https://opentuwa.com/sitemap.xml',
-    host: 'https://opentuwa.com',
+    sitemap: 'https://openXXX.com/sitemap.xml',
+    host: 'https://openXXX.com',
   };
 }
 ```
@@ -535,10 +534,10 @@ import type { Metadata } from 'next';
 export async function generateMetadata({ searchParams }: { searchParams: { term?: string } }): Promise<Metadata> {
   const term = searchParams.term;
   return {
-    title: term ? `${term} — Search Results on OpenTuwa` : 'Search — OpenTuwa',
-    description: term ? `Search results for "${term}" on OpenTuwa.` : 'Search OpenTuwa.',
+    title: term ? `${term} — Search Results on OpenXXX` : 'Search — OpenXXX',
+    description: term ? `Search results for "${term}" on OpenXXX.` : 'Search OpenXXX.',
     robots: { index: false, follow: true }, // parametrized result pages: keep out of the index
-    alternates: { canonical: 'https://opentuwa.com/search' }, // canonical points at the bare search page, not each query
+    alternates: { canonical: 'https://openXXX.com/search' }, // canonical points at the bare search page, not each query
   };
 }
 

@@ -17,8 +17,21 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   alternates: {
     canonical: '/',
+    languages: {
+      en: `${siteUrl}/en`,
+      ar: `${siteUrl}/ar`,
+      es: `${siteUrl}/es`,
+      fr: `${siteUrl}/fr`,
+      he: `${siteUrl}/he`,
+      zh: `${siteUrl}/zh`,
+    },
   },
   manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Tuwa',
+  },
   openGraph: {
     type: 'website',
     siteName: 'Tuwa',
@@ -58,6 +71,7 @@ export const metadata: Metadata = {
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
     'apple-mobile-web-app-title': 'Tuwa',
     'mobile-web-app-capable': 'yes',
+    'apple-itunes-app': 'app-id=YOUR_APP_ID, app-argument=https://muslim.opentuwa.com',
   },
 }
 
@@ -134,16 +148,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="application-name" content="Tuwa" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Tuwa" />
         <meta name="apple-mobile-web-app-orientations" content="portrait-primary" />
         <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#1C1C1E" />
+        <meta name="apple-itunes-app" content="app-id=YOUR_APP_ID, app-argument=https://muslim.opentuwa.com" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <link rel="icon" type="image/png" href="https://opentuwa.com/assets/ui/favicon-96x96.png" sizes="96x96" />
         <link rel="icon" type="image/svg+xml" href="https://opentuwa.com/assets/ui/favicon.svg" />
         <link rel="shortcut icon" href="https://opentuwa.com/assets/ui/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="https://opentuwa.com/assets/ui/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" sizes="152x152" href="https://opentuwa.com/assets/ui/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" sizes="120x120" href="https://opentuwa.com/assets/ui/apple-touch-icon.png" />
         <link rel="mask-icon" href="https://opentuwa.com/assets/ui/favicon.svg" color="#1C1C1E" />
         <link type="text/plain" rel="author" href="humans.txt" />
         <link rel="preconnect" href="https://everyayah.com" />
         <link rel="preconnect" href="https://raw.githubusercontent.com" />
+        <link rel="preconnect" href="https://hosting.opentuwa.com" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
