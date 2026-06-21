@@ -363,7 +363,10 @@ async function d1Query(sql, params = []) {
     body: JSON.stringify({ sql, params })
   });
   const data = await res.json();
-  if (!res.ok || data.error) throw new Error(data.error || `HTTP ${res.status}`);
+  if (!res.ok || data.error) {
+    if (data.error === 'Unauthorized') showTokenModal();
+    throw new Error(data.error || `HTTP ${res.status}`);
+  }
   return data.results || data.result;
 }
 
@@ -696,11 +699,7 @@ async function seedAlafasyData() {
 }
 
 /* ─── INIT ─── */
-window.onload = () => {
-  const savedToken = localStorage.getItem('cms_token');
-  if (!savedToken) showTokenModal();
-  loadArtists();
-};
+window.onload = () => loadArtists();
 </script>
 </body>
 </html>
