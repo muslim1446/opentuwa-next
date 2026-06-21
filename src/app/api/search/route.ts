@@ -49,13 +49,13 @@ const SURAH_NAMES: { name: string; num: number }[] = [
 
 export async function POST(request: NextRequest) {
   try {
-    const body: { query?: string } = await request.json()
+    const body = await request.json()
     const query = body.query
     if (!query) {
       return NextResponse.json({ error: 'Query is required' }, { status: 400 })
     }
 
-    const isNumeric = !isNaN(Number(query)) && Number(query) >= 1 && Number(query) <= 114
+    const isNumeric = !isNaN(query) && Number(query) >= 1 && Number(query) <= 114
     let chapters: number[] = []
 
     if (isNumeric) {

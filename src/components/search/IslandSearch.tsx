@@ -67,7 +67,7 @@ export function IslandSearch() {
           body: JSON.stringify({ query: searchQuery }),
         })
         if (!res.ok) throw new Error('Search failed')
-        const data: { chapters?: number[] } = await res.json()
+        const data = await res.json()
         results = data.chapters || []
       }
 

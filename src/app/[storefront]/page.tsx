@@ -1,19 +1,16 @@
 export const runtime = 'edge'
 
 import Link from 'next/link'
-import { PLATFORM_NAME } from '@/lib/configs'
+import { SURAH_METADATA } from '@/lib/surah-metadata'
+import { RECITERS_CONFIG, PLATFORM_NAME } from '@/lib/configs'
 import { slugify } from '@/lib/metadata'
 import { encodeAlbumId } from '@/lib/entity-ids'
 import { Breadcrumb } from '@/components/Breadcrumb'
-import { fetchArtists, fetchAlbums } from '@/lib/data'
 
 const siteUrl = 'https://muslim.opentuwa.com'
 
 export default async function StorefrontHome({ params }: { params: Promise<{ storefront: string }> }) {
   const { storefront } = await params
-
-  const artists = await fetchArtists()
-  const albums = await fetchAlbums()
 
   return (
     <>
@@ -32,10 +29,10 @@ export default async function StorefrontHome({ params }: { params: Promise<{ sto
             Artists
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
-            {artists.map((artist) => (
+            {Object.entries(RECITERS_CONFIG).map(([id, reciter]) => (
               <Link
-                key={artist.id}
-                href={`/${storefront}/reciter/${slugify(artist.name)}/${artist.id}`}
+                key={id}
+                href={`/${storefront}/reciter/${slugify(reciter.name)}/${id}`}
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -51,7 +48,7 @@ export default async function StorefrontHome({ params }: { params: Promise<{ sto
                   transition: 'background 0.2s',
                 }}
               >
-                {artist.name}
+                {reciter.name}
               </Link>
             ))}
           </div>
@@ -62,41 +59,44 @@ export default async function StorefrontHome({ params }: { params: Promise<{ sto
             Albums
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
-            {albums.map((album) => (
-              <Link
-                key={album.id}
-                href={`/${storefront}/album/${slugify(album.title)}`}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '12px 16px',
-                  borderRadius: 12,
-                  background: 'rgba(255,255,255,0.03)',
-                  textDecoration: 'none',
-                  color: 'rgba(255,255,255,0.8)',
-                  fontSize: 14,
-                  transition: 'background 0.2s',
-                }}
-              >
-                <span style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: 8,
-                  background: 'rgba(255,255,255,0.08)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: 'rgba(255,255,255,0.4)',
-                  flexShrink: 0,
-                }}>
-                  {album.track_count}
-                </span>
-                <span>{album.title}</span>
-              </Link>
-            ))}
+            {SURAH_METADATA.map((surah) => {
+              const albumId = encodeAlbumId(surah.chapter)
+              return (
+                <Link
+                  key={surah.chapter}
+                  href={`/${storefront}/album/${slugify(surah.english_name)}/${albumId}`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '12px 16px',
+                    borderRadius: 12,
+                    background: 'rgba(255,255,255,0.03)',
+                    textDecoration: 'none',
+                    color: 'rgba(255,255,255,0.8)',
+                    fontSize: 14,
+                    transition: 'background 0.2s',
+                  }}
+                >
+                  <span style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 8,
+                    background: 'rgba(255,255,255,0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: 'rgba(255,255,255,0.4)',
+                    flexShrink: 0,
+                  }}>
+                    {surah.chapter}
+                  </span>
+                  <span>{surah.english_name}</span>
+                </Link>
+              )
+            })}
           </div>
         </section>
       </div>

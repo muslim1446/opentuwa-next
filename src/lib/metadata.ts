@@ -17,7 +17,7 @@ export function buildAlbumMetadata(album: {
   releaseDate: string
   genres: string[]
 }): Metadata {
-  const url = `${SITE}/${album.storefront}/album/${album.slug}`
+  const url = `${SITE}/${album.storefront}/album/${album.slug}/${album.id}`
   const title = `${album.name} by ${album.artistName} on ${SITE_NAME}`
   const description = `Listen to ${album.name} by ${album.artistName} on ${SITE_NAME}. ${album.trackCount} songs.`
 
@@ -26,12 +26,7 @@ export function buildAlbumMetadata(album: {
     description,
     alternates: {
       canonical: url,
-      languages: {
-        en: `${SITE}/us/album/${album.slug}`,
-        ar: `${SITE}/sa/album/${album.slug}`,
-        ms: `${SITE}/my/album/${album.slug}`,
-        id: `${SITE}/id/album/${album.slug}`,
-      },
+      languages: buildHreflangMap('album', album.slug, album.id),
     },
     openGraph: {
       type: 'music.album',
@@ -73,7 +68,7 @@ export function buildSongMetadata(song: {
   const title = `${song.name} — Song by ${song.artistName} on ${SITE_NAME}`
   const description = `Listen to ${song.name} by ${song.artistName} on ${SITE_NAME}.`
   const artistUrl = `${SITE}/${song.storefront}/reciter/${song.artistSlug}/${song.artistId}`
-  const albumUrl = `${SITE}/${song.storefront}/album/${song.albumSlug}`
+  const albumUrl = `${SITE}/${song.storefront}/album/${song.albumSlug}/${song.albumId}`
 
   const other: Record<string, string> = {}
   if (song.previewUrl) {

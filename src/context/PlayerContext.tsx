@@ -352,7 +352,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     try {
       const res = await fetch('https://raw.githubusercontent.com/Quran-lite-pages-dev/Quran-lite.pages.dev/refs/heads/master/assets/data/translations/2TM3TM.json')
       if (!res.ok) throw new Error('Failed to load Quran JSON')
-      const jsonData: { chapters: any[] } = await res.json()
+      const jsonData = await res.json()
       const merged = jsonData.chapters.map((ch: any) => {
         const meta = SURAH_METADATA.find(m => m.chapter === ch.chapterNumber)
         return meta ? { ...ch, english_name: meta.english_name, description: meta.description } : ch
