@@ -54,7 +54,6 @@ export default async function ReciterPage({ params }: { params: Promise<{ storef
       <Breadcrumb
         items={[
           { name: 'Home', href: `${siteUrl}/${storefront}` },
-          { name: 'Artists', href: `${siteUrl}/${storefront}` },
           { name: reciter.name, href: url },
         ]}
       />

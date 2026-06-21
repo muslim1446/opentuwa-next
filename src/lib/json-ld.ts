@@ -82,19 +82,6 @@ export function breadcrumbJsonLd(items: { name: string; url: string }[]): JsonLd
   }
 }
 
-export function siteSearchJsonLd(): JsonLd {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    url: 'https://muslim.opentuwa.com',
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: 'https://muslim.opentuwa.com/en/search?term={search_term_string}',
-      'query-input': 'required name=search_term_string',
-    },
-  }
-}
-
 export function toISO8601Duration(seconds: number): string {
   const m = Math.floor(seconds / 60)
   const s = Math.round(seconds % 60)

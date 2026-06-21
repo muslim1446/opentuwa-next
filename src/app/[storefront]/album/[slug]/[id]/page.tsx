@@ -7,7 +7,7 @@ import { RECITERS_CONFIG, ARTIST_NAME, PLATFORM_NAME, DEFAULT_STOREFRONT } from 
 import { buildAlbumMetadata, buildSongMetadata, slugify } from '@/lib/metadata'
 import { albumJsonLd, toISO8601Duration } from '@/lib/json-ld'
 import { Breadcrumb } from '@/components/Breadcrumb'
-import { decodeAlbumId, decodeSongId, encodeAlbumId, encodeSongId } from '@/lib/entity-ids'
+import { decodeAlbumId, decodeSongId } from '@/lib/entity-ids'
 import HomeClient from '@/app/home-client'
 
 const siteUrl = 'https://muslim.opentuwa.com'
