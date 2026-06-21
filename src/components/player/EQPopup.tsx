@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { EQ_BANDS } from '@/lib/configs'
 
@@ -28,6 +28,7 @@ export function EQPopup() {
   const portalRef = useRef<HTMLDivElement>(null)
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null)
 
+  const [portalBottom, setPortalBottom] = useState('0px')
   const audioCtxRef = useRef<AudioContext | null>(null)
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null)
   const filterNodesRef = useRef<BiquadFilterNode[]>([])
@@ -106,6 +107,17 @@ export function EQPopup() {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
+  useLayoutEffect(() => {
+    if (isOpen && isMobile) {
+      const island = document.getElementById('player-island')
+      if (island) {
+        const rect = island.getBoundingClientRect()
+        const gap = 10
+        setPortalBottom(`${window.innerHeight - rect.top + gap}px`)
+      }
+    }
+  }, [isOpen, isMobile])
+
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
@@ -180,7 +192,7 @@ export function EQPopup() {
       onMouseLeave={handleMouseLeave}
     >
       {isOpen && isMobile ? createPortal(
-        <div ref={portalRef} className="mobile-popover-portal">{popoverContent}</div>,
+        <div ref={portalRef} className="mobile-popover-portal" style={{ bottom: portalBottom }}>{popoverContent}</div>,
         document.body
       ) : popoverContent}
       <button

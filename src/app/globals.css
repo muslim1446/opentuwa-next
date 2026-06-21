@@ -1265,22 +1265,24 @@ select:focus, select:hover {
     .island-track-title { font-size: 12px; }
     .island-track-subtitle { font-size: 10px; }
 
-    /* --- All portaled popups: centered floating card above island --- */
+    /* --- Portaled wrapper: centered fixed above island, bottom set by JS --- */
+    .mobile-popover-portal {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3200;
+    }
+    /* Inner popups: visible by default (only rendered when open), just styled */
     .mobile-popover-portal .eq-popover,
     .mobile-popover-portal .volume-popover,
     .mobile-popover-portal .custom-options {
-        position: fixed !important;
-        left: 50% !important;
-        right: auto !important;
-        bottom: 80px !important;
-        top: auto !important;
-        transform: translateX(-50%) translateY(8px) !important;
-        width: auto !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
         min-width: 160px;
         max-width: calc(100vw - 24px);
         border-radius: 16px;
         corner-shape: superellipse(2);
-        z-index: 3200;
     }
     .mobile-popover-portal .eq-popover {
         padding: 8px 12px;
@@ -1300,16 +1302,6 @@ select:focus, select:hover {
     .mobile-popover-portal .eq-popover::after,
     .mobile-popover-portal .volume-popover::after {
         display: none;
-    }
-
-    /* When open (visible) */
-    .mobile-popover-portal .eq-popover,
-    .mobile-popover-portal .volume-popover,
-    .mobile-popover-portal .custom-options {
-        opacity: 1 !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-        transform: translateX(-50%) translateY(0) !important;
     }
 
     /* Inner content compact sizing for portaled EQ */

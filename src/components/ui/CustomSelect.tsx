@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useIdleTimer } from '@/hooks/useIdleTimer'
 
@@ -22,6 +22,7 @@ export function CustomSelect({ items, value, onChange, placeholder, wrapperId }:
   const [isMobile, setIsMobile] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const portalRef = useRef<HTMLDivElement>(null)
+  const [portalBottom, setPortalBottom] = useState('0px')
   const isIdle = useIdleTimer()
 
   const selected = items.find(i => i.value === value)
@@ -45,6 +46,17 @@ export function CustomSelect({ items, value, onChange, placeholder, wrapperId }:
     mq.addEventListener('change', handler)
     return () => mq.removeEventListener('change', handler)
   }, [])
+
+  useLayoutEffect(() => {
+    if (isOpen && isMobile) {
+      const island = document.getElementById('player-island')
+      if (island) {
+        const rect = island.getBoundingClientRect()
+        const gap = 10
+        setPortalBottom(`${window.innerHeight - rect.top + gap}px`)
+      }
+    }
+  }, [isOpen, isMobile])
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -88,7 +100,7 @@ export function CustomSelect({ items, value, onChange, placeholder, wrapperId }:
         <span>{displayText}</span>
       </button>
       {isOpen && isMobile ? createPortal(
-        <div ref={portalRef} className="mobile-popover-portal">{optionsContent}</div>,
+        <div ref={portalRef} className="mobile-popover-portal" style={{ bottom: portalBottom }}>{optionsContent}</div>,
         document.body
       ) : optionsContent}
     </div>

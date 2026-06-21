@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { usePlayer } from '@/context/PlayerContext'
 
@@ -10,6 +10,7 @@ export function VolumeControl() {
   const [isMobile, setIsMobile] = useState(false)
   const wrapRef = useRef<HTMLDivElement>(null)
   const portalRef = useRef<HTMLDivElement>(null)
+  const [portalBottom, setPortalBottom] = useState('0px')
   const muteTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
@@ -19,6 +20,17 @@ export function VolumeControl() {
     mq.addEventListener('change', handler)
     return () => mq.removeEventListener('change', handler)
   }, [])
+
+  useLayoutEffect(() => {
+    if (isOpen && isMobile) {
+      const island = document.getElementById('player-island')
+      if (island) {
+        const rect = island.getBoundingClientRect()
+        const gap = 10
+        setPortalBottom(`${window.innerHeight - rect.top + gap}px`)
+      }
+    }
+  }, [isOpen, isMobile])
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -60,7 +72,7 @@ export function VolumeControl() {
   return (
     <div ref={wrapRef} className={`island-volume-wrap ${isOpen ? 'volume-open' : ''}`} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       {isOpen && isMobile ? createPortal(
-        <div ref={portalRef} className="mobile-popover-portal">{popoverContent}</div>,
+        <div ref={portalRef} className="mobile-popover-portal" style={{ bottom: portalBottom }}>{popoverContent}</div>,
         document.body
       ) : popoverContent}
       <button
