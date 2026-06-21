@@ -50,7 +50,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const album of albumsList) {
     urls.push({
-      url: `${siteUrl}/us/album/${album.slug}/${album.id}`,
+      url: `${siteUrl}/us/album/${album.slug}`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,

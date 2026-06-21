@@ -65,7 +65,7 @@ export default async function StorefrontHome({ params }: { params: Promise<{ sto
             {albums.map((album) => (
               <Link
                 key={album.id}
-                href={`/${storefront}/album/${slugify(album.title)}/${album.id}`}
+                href={`/${storefront}/album/${slugify(album.title)}`}
                 style={{
                   display: 'flex',
                   alignItems: 'center',

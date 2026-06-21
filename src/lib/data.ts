@@ -123,6 +123,17 @@ export async function fetchAlbums(artistId?: string): Promise<AlbumData[]> {
   }))
 }
 
+export async function fetchAlbumBySlug(slug: string): Promise<AlbumData | null> {
+  const db = getDB()
+  if (db) {
+    try {
+      const row = await getAlbumBySlug(db, slug)
+      if (row) return { ...row }
+    } catch { /* fallthrough */ }
+  }
+  return null
+}
+
 export async function fetchAlbum(id: string): Promise<AlbumData | null> {
   const db = getDB()
   if (db) {

@@ -89,7 +89,7 @@ export default async function ReciterPage({
           {albums.map((album) => (
             <Link
               key={album.id}
-              href={`/${storefront}/album/${slugify(album.title)}/${album.id}`}
+              href={`/${storefront}/album/${slugify(album.title)}`}
               style={{
                 display: 'flex',
                 flexDirection: 'column',

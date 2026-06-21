@@ -16,12 +16,18 @@ const DEFAULT_ARTWORK = 'https://opentuwa.com/assets/ui/web_1200.png'
 
 export const revalidate = 86400
 
-export async function generateMetadata({ params }: { params: Promise<{ storefront: string; slug: string; id: string }> }): Promise<Metadata> {
+function getTrackId(id: string, t?: string): string {
+  return t || id
+}
+
+export async function generateMetadata({ params, searchParams }: { params: Promise<{ storefront: string; slug: string; id: string }>; searchParams: Promise<{ t?: string }> }): Promise<Metadata> {
   const { storefront, id } = await params
-  const decoded = decodeSongId(id)
+  const { t } = await searchParams
+  const trackId = getTrackId(id, t)
+  const decoded = decodeSongId(trackId)
   if (!decoded) return {}
 
-  const track = await fetchTrack(id)
+  const track = await fetchTrack(trackId)
   const album = track ? await fetchAlbum(track.album_id) : null
   const artist = track ? await fetchArtist(track.artist_id) : null
 
@@ -56,15 +62,19 @@ export async function generateMetadata({ params }: { params: Promise<{ storefron
 
 export default async function SongPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ storefront: string; slug: string; id: string }>
+  searchParams: Promise<{ t?: string }>
 }) {
   const { storefront, slug: paramSlug, id } = await params
+  const { t } = await searchParams
+  const trackId = getTrackId(id, t)
 
-  const decoded = decodeSongId(id)
+  const decoded = decodeSongId(trackId)
   if (!decoded) notFound()
 
-  const track = await fetchTrack(id)
+  const track = await fetchTrack(trackId)
   const album = track ? await fetchAlbum(track.album_id) : null
   const artist = track ? await fetchArtist(track.artist_id) : null
 
@@ -77,13 +87,15 @@ export default async function SongPage({
   const correctSlug = slugify(songName)
 
   if (paramSlug !== correctSlug) {
-    redirect(`/${storefront}/song/${correctSlug}/${id}`)
+    const target = `/${storefront}/song/${correctSlug}/${id}`
+    redirect(t ? `${target}?t=${t}` : target)
   }
 
-  const url = `${siteUrl}/${storefront}/song/${correctSlug}/${id}`
+  const albumSlug = slugify(albumName)
+  const url = t ? `${siteUrl}/${storefront}/song/${correctSlug}/${id}?t=${t}` : `${siteUrl}/${storefront}/song/${correctSlug}/${id}`
   const albumId = album?.id || encodeAlbumId(decoded.chapter)
   const reciterUrl = `${siteUrl}/${storefront}/reciter/${slugify(artistName)}/${track?.artist_id || 'alafasy'}`
-  const albumUrl = `${siteUrl}/${storefront}/album/${slugify(albumName)}/${albumId}`
+  const albumUrl = `${siteUrl}/${storefront}/album/${albumSlug}`
 
   const jsonLd = songJsonLd({
     name: songName,
