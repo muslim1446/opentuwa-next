@@ -21,22 +21,18 @@ export function VolumeControl() {
 
   const displayVolume = isMuted ? 0 : volume
 
-  const handleMouseEnterArea = () => {
+  const handleMouseEnter = () => {
     if (muteTimerRef.current) clearTimeout(muteTimerRef.current)
     setIsOpen(true)
   }
 
-  const handleMouseLeaveArea = () => {
+  const handleMouseLeave = () => {
     muteTimerRef.current = setTimeout(() => setIsOpen(false), 500)
   }
 
-  const handlePopoverEnter = () => {
-    if (muteTimerRef.current) clearTimeout(muteTimerRef.current)
-  }
-
   return (
-    <div ref={wrapRef} className={`island-volume-wrap ${isOpen ? 'volume-open' : ''}`} onMouseEnter={handleMouseEnterArea} onMouseLeave={handleMouseLeaveArea}>
-      <div className="volume-popover" onMouseEnter={handlePopoverEnter}>
+    <div ref={wrapRef} className={`island-volume-wrap ${isOpen ? 'volume-open' : ''}`} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <div className="volume-popover">
         <input
           type="range"
           min="0"

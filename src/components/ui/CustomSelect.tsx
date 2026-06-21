@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useIdleTimer } from '@/hooks/useIdleTimer'
 
 interface SelectItem {
   value: string
@@ -18,14 +19,16 @@ interface CustomSelectProps {
 export function CustomSelect({ items, value, onChange, placeholder, wrapperId }: CustomSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const isIdle = useIdleTimer()
 
   const selected = items.find(i => i.value === value)
   const displayText = selected?.text || placeholder || 'Select...'
 
   const handleTriggerClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
+    if (isIdle) return
     setIsOpen(prev => !prev)
-  }, [])
+  }, [isIdle])
 
   const handleOptionClick = useCallback((itemValue: string) => {
     onChange(itemValue)
