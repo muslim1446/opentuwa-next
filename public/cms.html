@@ -605,7 +605,8 @@ async function saveTrack() {
   const trackId = editingTrackId || (album?.artist_id ? album.artist_id + '-' + albumId + '-' + trackNum : Date.now().toString(36));
   try {
     const artistId = album?.artist_id || '';
-    const params = [albumId, artistId, title, trackNum, parseInt(val('tr-disc'))||1,
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+    const params = [albumId, artistId, title, slug, trackNum, parseInt(val('tr-disc'))||1,
       parseInt(val('tr-duration'))||8000, val('tr-audio'), val('tr-preview'),
       val('tr-timing'), val('tr-isrc')];
     if (editingTrackId) {
@@ -614,7 +615,7 @@ async function saveTrack() {
       toast('Track updated','success');
     } else {
       params.unshift(trackId);
-      await d1Query('INSERT INTO tracks (id,album_id,artist_id,title,track_number,disc_number,duration_ms,audio_url,preview_url,timing_json_url,isrc,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,datetime(\'now\'),datetime(\'now\'))', params);
+      await d1Query('INSERT INTO tracks (id,album_id,artist_id,title,slug,track_number,disc_number,duration_ms,audio_url,preview_url,timing_json_url,isrc,has_timing,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,0,datetime(\'now\'),datetime(\'now\'))', params);
       toast('Track created','success');
     }
     await loadTracks();
@@ -652,8 +653,9 @@ async function seedAlafasyData() {
       for (let v = 1; v <= vc; v++) {
         const trackId = String(ch).padStart(3,'0') + String(v).padStart(3,'0') + '00000';
         const paddedCh = String(ch).padStart(3,'0');
-        await d1Query('INSERT OR REPLACE INTO tracks (id,album_id,artist_id,title,track_number,disc_number,duration_ms,audio_url,timing_json_url,has_timing,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,datetime(\'now\'),datetime(\'now\'))',
-          [trackId,albumId,'alafasy',`${name} — Verse ${v}`,v,1,8000,`${AUDIO_BASE}/${paddedCh}.wav`,`${TIMING_BASE}/${paddedCh}.json`,1]);
+        const trackSlug = `verse-${v}`;
+        await d1Query('INSERT OR REPLACE INTO tracks (id,album_id,artist_id,title,slug,track_number,disc_number,duration_ms,audio_url,timing_json_url,has_timing,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,datetime(\'now\'),datetime(\'now\'))',
+          [trackId,albumId,'alafasy',`${name} — Verse ${v}`,trackSlug,v,1,8000,`${AUDIO_BASE}/${paddedCh}.wav`,`${TIMING_BASE}/${paddedCh}.json`,1]);
       }
       if (i % 10 === 0) toast(`Album ${ch}/114: ${name}`,'info');
     }
